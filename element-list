@@ -1,0 +1,17 @@
+unnamed package
+repository
+service
+socialnetwork
+socialnetwork.config
+socialnetwork.design
+socialnetwork.domain
+socialnetwork.domain.validators
+socialnetwork.repository
+socialnetwork.repository.file
+socialnetwork.repository.memory
+socialnetwork.service
+socialnetwork.ui
+socialnetwork.ui.tui
+socialnetwork.Utils
+utils
+validator
