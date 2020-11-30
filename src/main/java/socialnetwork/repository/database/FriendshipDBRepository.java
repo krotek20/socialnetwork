@@ -16,15 +16,16 @@ public class FriendshipDBRepository
 
     public FriendshipDBRepository(String url, String username, String password, Validator<Friendship> validator) {
         super(validator, username, password, url);
+        this.findAll();
     }
 
     @Override
     public Friendship extractEntity(ResultSet resultSet) throws SQLException {
         Friendship friendship = new Friendship(
                 resultSet.getLong("FIRST_ID"),
-                resultSet.getLong("SECOND_ID"));
+                resultSet.getLong("SECOND_ID"),
+                resultSet.getLong("ID_NOTIFICATION"));
         friendship.setDate(resultSet.getTimestamp("DATE").toLocalDateTime());
-        friendship.setNotificationID(resultSet.getLong("ID_NOTIFICATION"));
         short dbStatus = resultSet.getShort("FRIENDSHIP_STATUS");
         friendship.setStatus(FriendshipStatus.fromValue(dbStatus));
         return friendship;

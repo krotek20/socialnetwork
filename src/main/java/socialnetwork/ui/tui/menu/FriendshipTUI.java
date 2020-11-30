@@ -2,7 +2,6 @@ package socialnetwork.ui.tui.menu;
 
 import socialnetwork.domain.enums.Role;
 import socialnetwork.service.FriendshipService;
-import socialnetwork.ui.UI;
 import socialnetwork.ui.tui.BaseTUI;
 
 import java.util.HashMap;
@@ -17,16 +16,16 @@ public class FriendshipTUI extends BaseTUI {
         this.friendshipService = friendshipService;
         if (loggedUser != null) {
             if (loggedUser.getRole() == Role.ADMIN) {
-                generateTUI("Friendship TUI", new HashMap<String, UI>() {{
+                generateTUI("Friendship TUI", new HashMap<String, Runnable>() {{
                     put("Display all friendships", FriendshipTUI.this::displayAllFriendships);
                     put("Search one friendship", FriendshipTUI.this::searchOneFriendship);
                     put("Number of communities", FriendshipTUI.this::numberOfCommunities);
                     put("Largest community", FriendshipTUI.this::largestCommunity);
                     put("Delete friendship", FriendshipTUI.this::deleteFriendship);
-                    put("Create friendship", FriendshipTUI.this::addFriendship);
+                    put("Add friend", FriendshipTUI.this::requestFriendship);
                 }});
             } else {
-                generateTUI("Friendship TUI", new HashMap<String, UI>() {{
+                generateTUI("Friendship TUI", new HashMap<String, Runnable>() {{
                     put("Search one friendship", FriendshipTUI.this::searchOneFriendship);
                     put("Largest community", FriendshipTUI.this::largestCommunity);
                     put("Remove friend", FriendshipTUI.this::deleteFriendship);
@@ -34,11 +33,6 @@ public class FriendshipTUI extends BaseTUI {
                 }});
             }
         }
-    }
-
-    private void addFriendship() {
-        Map<String, String> friendshipMap = readMap("id1", "id2");
-        System.out.println("Operation " + (friendshipService.addFriendship(friendshipMap) ? "successful" : "failed"));
     }
 
     private void requestFriendship() {
@@ -57,7 +51,9 @@ public class FriendshipTUI extends BaseTUI {
             friendshipMap = readMap("id1");
             friendshipMap.put("id2", loggedUser.getID().toString());
         }
-        System.out.println("Operation " + (friendshipService.deleteFriendship(friendshipMap) ? "successful" : "failed"));
+        System.out.println("Operation " +
+                (friendshipService.deleteFriendship(friendshipMap) ?
+                        "successful" : "failed"));
     }
 
     private void largestCommunity() {

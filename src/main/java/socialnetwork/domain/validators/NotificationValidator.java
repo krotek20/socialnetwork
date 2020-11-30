@@ -20,5 +20,9 @@ public class NotificationValidator implements Validator<Notification> {
         if (notification.getNotificationText().equals("")) {
             throw new ValidationException("Notification text can't be null!");
         }
+        // validate entity text
+        if (notification.getEntityText().equals("")) {
+            throw new ValidationException("Entity text can't be null!");
+        }
     }
 }

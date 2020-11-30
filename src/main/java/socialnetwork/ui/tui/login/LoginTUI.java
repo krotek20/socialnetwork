@@ -1,7 +1,6 @@
 package socialnetwork.ui.tui.login;
 
 import socialnetwork.service.*;
-import socialnetwork.ui.UI;
 import socialnetwork.ui.tui.BaseTUI;
 import socialnetwork.ui.tui.menu.MainTUI;
 
@@ -38,7 +37,7 @@ public class LoginTUI extends BaseTUI {
         this.userService = userService;
         this.chatService = chatService;
 
-        generateTUI("Login TUI", new HashMap<String, UI>() {{
+        generateTUI("Login TUI", new HashMap<String, Runnable>() {{
             put("Login", LoginTUI.this::login);
             put("Register", LoginTUI.this::register);
         }});

@@ -1,5 +1,7 @@
 package socialnetwork.domain.dto;
 
+import socialnetwork.Utils.Constants;
+
 import java.time.LocalDateTime;
 
 public class FriendshipDTO {
@@ -40,6 +42,6 @@ public class FriendshipDTO {
                 "%-15s%-15s%s",
                 firstname,
                 lastname,
-                date.toString());
+                date.format(Constants.DATE_TIME_FORMATTER));
     }
 }

@@ -4,7 +4,6 @@ import socialnetwork.domain.entities.Notification;
 import socialnetwork.service.FriendshipService;
 import socialnetwork.service.MessageService;
 import socialnetwork.service.NotificationService;
-import socialnetwork.ui.UI;
 import socialnetwork.ui.tui.BaseTUI;
 
 import java.util.HashMap;
@@ -24,10 +23,9 @@ public class NotificationTUI extends BaseTUI {
         this.messageService = messageService;
 
         if (loggedUser != null) {
-            generateTUI("Notification TUI", new HashMap<String, UI>() {{
+            generateTUI("Notification TUI", new HashMap<String, Runnable>() {{
                 put("New notifications", NotificationTUI.this::displayNotificationsSize);
                 put("Display all notifications", NotificationTUI.this::displayAllNotifications);
-                put("Delete all notifications", NotificationTUI.this::deleteAllNotifications);
             }});
         }
     }
@@ -53,12 +51,7 @@ public class NotificationTUI extends BaseTUI {
             System.out.println(notification.getKey() + ". " + notification.getValue().getNotificationText());
         }
         ReplyNotificationTUI replyNotificationTUI = new ReplyNotificationTUI(
-                friendshipService, messageService, notificationsHelper);
+                notificationService, friendshipService, messageService, notificationsHelper);
         replyNotificationTUI.run();
-    }
-
-    private void deleteAllNotifications() {
-        notificationService.deleteAllNotifications(loggedUser);
-        System.out.println("Notifications has been deleted!");
     }
 }

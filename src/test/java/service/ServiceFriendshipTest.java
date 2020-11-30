@@ -33,7 +33,7 @@ public class ServiceFriendshipTest {
         Repository<Tuple<Long, Long>, Friendship> friendshipRepositoryTest = new InMemoryRepository<>(friendshipValidatorTest);
         Repository<Long, User> userRepositoryTest = new InMemoryRepository<>(userValidatorTest);
         Repository<Long, Chat> chatRepositoryTest = new InMemoryRepository<>(chatValidatorTest);
-        Repository<User, Notification> notificationRepositoryTest = new InMemoryRepository<>(notificationValidatorTest);
+        Repository<Long, Notification> notificationRepositoryTest = new InMemoryRepository<>(notificationValidatorTest);
 
         User ghostUser = new User("", "", "", "", null, null);
         ghostUser.resetCount();

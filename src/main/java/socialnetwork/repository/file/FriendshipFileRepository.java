@@ -27,7 +27,7 @@ public class FriendshipFileRepository extends AbstractFileRepository<Tuple<Long,
         String id1 = attributes.get(0);
         String id2 = attributes.get(1);
         String date = attributes.get(2);
-        Friendship friendship = new Friendship(Parse.safeParseLong(id1), Parse.safeParseLong(id2));
+        Friendship friendship = new Friendship(Parse.safeParseLong(id1), Parse.safeParseLong(id2), 0);
         friendship.setDate(LocalDateTime.parse(date));
         return friendship;
     }

@@ -15,42 +15,42 @@ import java.util.TreeSet;
 public class BaseTUI implements UI {
     // CONSTANTS
     /**
-     * Constant representing the option to exit the Main TUI
+     * Constant representing the option to exit the Main TUI.
      */
     protected static final String EXIT_OPTION;
     /**
-     * Constant representing the option to logout the Login TUI
+     * Constant representing the option to logout the Login TUI.
      */
     protected static final String LOGOUT_OPTION;
     /**
-     * Constant representing the option to get back to the Main TUI
+     * Constant representing the option to get back to the Main TUI.
      */
     protected static final String BACK_OPTION;
     /**
-     * Constant by which the title is preceded
+     * Constant by which the title is preceded.
      */
     protected static final String TITLE_PREFIX;
     /**
-     * Constant by which the every option in the list of options is preceded
+     * Constant by which the every option in the list of options is preceded.
      */
     protected static final String OPTION_PREFIX;
     /**
-     * Constant representing the option prompter
+     * Constant representing the option prompter.
      */
     protected static final String OPTION_PROMPT;
     /**
-     * Constant representing the text to be displayed after an action is completed
+     * Constant representing the text to be displayed after an action is completed.
      */
     protected static final String CONTINUE_PROMPT;
     /**
-     * Constant representing the text to be displayed when no option is found for the user input
+     * Constant representing the text to be displayed when no option is found for the user input.
      */
     protected static final String INVALID_OPTION;
     // END OF CONSTANTS
 
     public static User loggedUser = null;
     private String tui = "";
-    private Map<String, UI> tuiMenu = new HashMap<>();
+    private Map<String, Runnable> tuiMenu = new HashMap<>();
 
     static {
         EXIT_OPTION = "EXIT";
@@ -64,14 +64,14 @@ public class BaseTUI implements UI {
     }
 
     /**
-     * (Re)Generate the UI text and functionality
-     * This can and should be called in the constructor of the subclasses to initialize their specific UI
-     * Otherwise the user will be prompted with an empty UI
+     * (Re)Generate the UI text and functionality.
+     * This can and should be called in the constructor of the subclasses to initialize their specific UI.
+     * Otherwise the user will be prompted with an empty UI.
      *
-     * @param tuiTitle text printed before printing all the options
-     * @param tuiMenu  associations between options and functionality (command pattern)
+     * @param tuiTitle text printed before printing all the options.
+     * @param tuiMenu  associations between options and functionality (command pattern).
      */
-    protected void generateTUI(String tuiTitle, Map<String, UI> tuiMenu) {
+    protected void generateTUI(String tuiTitle, Map<String, Runnable> tuiMenu) {
         this.tuiMenu = tuiMenu;
 
         StringBuilder tui = new StringBuilder();
@@ -98,10 +98,10 @@ public class BaseTUI implements UI {
     }
 
     /**
-     * Read one string from the console
+     * Read one string from the console.
      *
-     * @param key prompt representing the desired input from the user
-     * @return user input
+     * @param key prompt representing the desired input from the user.
+     * @return user input.
      */
     protected String readOne(String key) {
         Scanner scanner = new Scanner(System.in);
@@ -110,11 +110,11 @@ public class BaseTUI implements UI {
     }
 
     /**
-     * Read multiple strings from the console
-     * Calls readOne for every key in keys
+     * Read multiple strings from the console.
+     * Calls readOne for every key in keys.
      *
-     * @param keys prompts for every desired input from the user
-     * @return a map with values input by user and their corresponding keys
+     * @param keys prompts for every desired input from the user.
+     * @return a map with values input by user and their corresponding keys.
      */
     protected Map<String, String> readMap(String... keys) {
         Map<String, String> map = new HashMap<>();
@@ -126,11 +126,11 @@ public class BaseTUI implements UI {
 
     /**
      * General loop body displaying the UI, asking for user input
-     * and then calling the corresponding functionality for the chosen option
-     * The option is chosen by iterating the list of options and checking if an option contains the input string
-     * The match is case insensitive and the first option found is called, ignoring the rest
+     * and then calling the corresponding functionality for the chosen option.
+     * The option is chosen by iterating the list of options and checking if an option contains the input string.
+     * The match is case insensitive and the first option found is called, ignoring the rest.
      *
-     * @return true if the user didn't input the EXIT_OPTION string; false otherwise
+     * @return true if the user didn't input the EXIT_OPTION string; false otherwise.
      */
     private Boolean loop() {
         Scanner scanner = new Scanner(System.in);

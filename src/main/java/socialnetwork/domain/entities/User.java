@@ -11,23 +11,23 @@ import java.util.StringJoiner;
 public class User implements Entity<Long> {
     private static long count = 1;
     private long id;
+    private Role role;
     private String firstName;
     private String lastName;
     private String email;
     private String password;
-    private LocalDate birthDate;
     private Gender gender;
-    private Role role;
+    private LocalDate birthDate;
 
     public User(String firstName, String lastName, String email, String password, LocalDate birthDate, Gender gender) {
         this.id = count;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.password = password;
-        this.birthDate = birthDate;
-        this.gender = gender;
         this.role = Role.USER;
+        this.email = email;
+        this.gender = gender;
+        this.password = password;
+        this.lastName = lastName;
+        this.firstName = firstName;
+        this.birthDate = birthDate;
     }
 
     // begin of GETTERS and SETTERS

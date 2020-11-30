@@ -12,21 +12,33 @@ public class Notification implements Entity<Long> {
     private static long count = 1;
     private long id;
     private User from;
-    private long entityID;
+    private String entityText;
     private String notificationText;
-    private Map<User, NotificationStatus> notifiedUsers;
     private LocalDateTime timestamp;
     private NotificationType type;
+    private Map<User, NotificationStatus> notifiedUsers;
 
-    public Notification(Set<User> notifiedUsers, User from, long entityID,
+    public Notification(Set<User> notifiedUsers, User from, String entityText,
                         NotificationType type, String notificationText,
                         LocalDateTime timestamp) {
         this.id = count;
         this.from = from;
         this.type = type;
-        this.entityID = entityID;
         this.timestamp = timestamp;
-        this.notifiedUsers = new HashMap<User, NotificationStatus>();
+        this.entityText = entityText;
+        this.notifiedUsers = initializeNotifiedUsers(notifiedUsers);
+        this.notificationText = notificationText;
+    }
+
+    public Notification(User from, String entityText,
+                        NotificationType type, String notificationText,
+                        LocalDateTime timestamp) {
+        this.id = count;
+        this.from = from;
+        this.type = type;
+        this.entityText = entityText;
+        this.timestamp = timestamp;
+        this.notifiedUsers = new HashMap<>();
         this.notificationText = notificationText;
     }
 
@@ -40,11 +52,11 @@ public class Notification implements Entity<Long> {
         this.id = id;
     }
 
-    public Set<User> getNotifiedUsers() {
+    public Map<User, NotificationStatus> getNotifiedUsers() {
         return notifiedUsers;
     }
 
-    public void setNotifiedUsers(Set<User> notifiedUsers) {
+    public void setNotifiedUsers(Map<User, NotificationStatus> notifiedUsers) {
         this.notifiedUsers = notifiedUsers;
     }
 
@@ -56,12 +68,12 @@ public class Notification implements Entity<Long> {
         this.type = type;
     }
 
-    public long getEntityID() {
-        return entityID;
+    public String getEntityText() {
+        return entityText;
     }
 
-    public void setEntityID(long entityID) {
-        this.entityID = entityID;
+    public void setEntityText(String entityText) {
+        this.entityText = entityText;
     }
 
     public LocalDateTime getTimestamp() {
@@ -70,14 +82,6 @@ public class Notification implements Entity<Long> {
 
     public void setTimestamp(LocalDateTime timestamp) {
         this.timestamp = timestamp;
-    }
-
-    public NotificationStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(NotificationStatus status) {
-        this.status = status;
     }
 
     public User getFrom() {
@@ -114,8 +118,20 @@ public class Notification implements Entity<Long> {
         count = 1;
     }
 
-    public void addNotifiedUser(User user) {
-        this.notifiedUsers.add(user);
+    /**
+     * Initializes notified users of this notification
+     * with the notification status as SEEN.
+     *
+     * @param notifiedUsers users to be notified.
+     * @return the map of required users (keys)
+     * with their notification status (values).
+     */
+    private Map<User, NotificationStatus> initializeNotifiedUsers(Set<User> notifiedUsers) {
+        Map<User, NotificationStatus> users = new HashMap<>();
+        for (User user : notifiedUsers) {
+            users.put(user, NotificationStatus.UNSEEN);
+        }
+        return users;
     }
 
     @Override
@@ -123,14 +139,13 @@ public class Notification implements Entity<Long> {
         StringJoiner joiner = new StringJoiner(";");
         joiner.add(String.valueOf(id))
                 .add(from.getID().toString())
-                .add(notifiedUsers.stream()
+                .add(notifiedUsers.keySet().stream()
                         .map(User::getID)
                         .collect(Collectors.toList())
                         .toString())
                 .add(notificationText)
                 .add(type.toString())
-                .add(String.valueOf(entityID))
-                .add(status.toString());
+                .add(entityText);
         return joiner.toString();
     }
 

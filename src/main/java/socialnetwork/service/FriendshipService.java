@@ -7,17 +7,20 @@ import socialnetwork.domain.entities.Chat;
 import socialnetwork.domain.entities.Friendship;
 import socialnetwork.domain.entities.Notification;
 import socialnetwork.domain.entities.User;
+import socialnetwork.domain.enums.FriendshipStatus;
+import socialnetwork.domain.enums.NotificationType;
 import socialnetwork.domain.validators.ValidationException;
 import socialnetwork.repository.Repository;
 import socialnetwork.repository.RepositoryException;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 /**
  * Friendship service class
- * Main friendship functionalities are implemented here
+ * Main friendship functionalities are implemented here.
  */
 public class FriendshipService extends NotificationService {
     private final Repository<Tuple<Long, Long>, Friendship> friendshipRepository;
@@ -27,7 +30,7 @@ public class FriendshipService extends NotificationService {
     public FriendshipService(Repository<Tuple<Long, Long>, Friendship> friendshipRepository,
                              Repository<Long, User> userRepository,
                              Repository<Long, Chat> chatRepository,
-                             Repository<User, Notification> notificationRepository) {
+                             Repository<Long, Notification> notificationRepository) {
         super(notificationRepository);
         this.friendshipRepository = friendshipRepository;
         this.userRepository = userRepository;
@@ -58,46 +61,66 @@ public class FriendshipService extends NotificationService {
     }
 
     /**
-     * Creates a new chat between two new friends.
-     * The name of the new created chat will be formed of
+     * Creates a new chat between two new friends and notifies
+     * the user who sent the friend request of the new chat.
+     * The title of the new created chat will be formed of
      * the users firstname separated by comma.
      *
      * @param friends tuple of new friends (users).
      * @throws ValidationException when chat data are not valid.
      */
     private void createChatBetweenFriends(Tuple<User, User> friends) throws ValidationException {
-        Chat chat = new Chat(friends.getLeft().getFirstName() + ", " + friends.getRight().getFirstName());
+        Notification notification = super.createNotification(Set.of(friends.getLeft()), friends.getRight(),
+                String.format("You and %s %s are friends now. Start a new conversation in the private chat!",
+                        friends.getRight().getFirstName(), friends.getRight().getLastName()),
+                NotificationType.CHAT, "New chat!", LocalDateTime.now());
+        super.updateSeenNotification(notification);
+
+        Chat chat = new Chat(friends.getLeft().getFirstName() + ", " + friends.getRight().getFirstName(),
+                notification.getID());
         chat.setCount(chat.getID());
         chat.setUsers(Set.of(friends.getLeft(), friends.getRight()));
         chatRepository.save(chat);
     }
 
     /**
-     * Add a new friendship between two users from the input data.
-     * This method validates the input users. If they are valid
-     * then a new chat between them will be created.
+     * Sets the status of the given friendship as APPROVED.
+     * A new chat between the new friends will be created.
      *
-     * @param friendshipMap key-value pairs representing the friendship attributes.
-     * @return true if saved; false otherwise
+     * @param friendship instance of friendship.
      * @throws ValidationException when at least one value is invalid.
-     * @throws RepositoryException when id does not exist in User repository.
-     * @throws ServiceException    when id is not a Long parsable value.
+     * @throws RepositoryException when the given friendship is not found in repository.
      */
-    public boolean addFriendship(Map<String, String> friendshipMap)
-            throws ValidationException, RepositoryException, ServiceException {
-        Tuple<User, User> newFriends = localValidation(friendshipMap);
-        createChatBetweenFriends(newFriends);
-        Friendship friendship = new Friendship(newFriends.getLeft().getID(), newFriends.getRight().getID());
-        return friendshipRepository.save(friendship) == null;
+    public void acceptFriendship(Friendship friendship)
+            throws ValidationException, RepositoryException {
+        User firstFriend = userRepository.findOne(friendship.getID().getLeft());
+        User secondFriend = userRepository.findOne(friendship.getID().getRight());
+        createChatBetweenFriends(new Tuple<>(firstFriend, secondFriend));
+        friendship.setStatus(FriendshipStatus.APPROVED);
+        friendshipRepository.update(friendship);
+    }
+
+    /**
+     * Sets given friendship status as REJECTED.
+     *
+     * @param friendship instance of friendship.
+     * @throws ValidationException when at least one value is invalid.
+     * @throws RepositoryException when the given friendship is not found in repository.
+     */
+    public void rejectFriendship(Friendship friendship)
+            throws ValidationException, RepositoryException {
+        friendship.setStatus(FriendshipStatus.REJECTED);
+        friendshipRepository.update(friendship);
     }
 
     /**
      * Requests a new Friendship between two users.
-     * It temporary saves the new Friendship to get its data for a notification
-     * and then deletes it until the notifiedUser will accept the request.
+     * It saves the new Friendship to get its data for a notification
+     * with the status PENDING and sends a notification to the requested user.
      *
      * @param friendshipMap key-value pairs representing the friendship attributes.
-     * @return true if the request has been successfully sent; otherwise false.
+     * @return true if the request has been successfully sent
+     * and the friendship has been saved with success; otherwise false.
      * @throws ValidationException when at least one value is invalid.
      * @throws RepositoryException when id does not exist in User repository.
      * @throws ServiceException    when id is not a Long parsable value.
@@ -105,14 +128,14 @@ public class FriendshipService extends NotificationService {
     public boolean requestFriendship(Map<String, String> friendshipMap)
             throws ValidationException, RepositoryException, ServiceException {
         Tuple<User, User> newFriends = localValidation(friendshipMap);
-        Friendship friendship = new Friendship(newFriends.getLeft().getID(), newFriends.getRight().getID());
-        if (friendshipRepository.save(friendship) == null) {
-            deleteFriendship(friendshipMap);
-            super.createNotification(newFriends.getLeft(), newFriends.getRight(),
-                    null, friendship, "New friend request!");
-            return true;
-        }
-        return false;
+        Notification notification = super.createNotification(
+                Set.of(newFriends.getLeft()), newFriends.getRight(), String.format(
+                        "%s %s sent you a friend request",
+                        newFriends.getRight().getFirstName(), newFriends.getRight().getLastName()),
+                NotificationType.FRIENDSHIP, "New friend request!", LocalDateTime.now());
+        Friendship friendship = new Friendship(newFriends.getLeft().getID(),
+                newFriends.getRight().getID(), notification.getID());
+        return friendshipRepository.save(friendship) == null;
     }
 
     /**
@@ -127,7 +150,7 @@ public class FriendshipService extends NotificationService {
         Long id1 = Parse.safeParseLong(friendshipMap.get("id1"));
         Long id2 = Parse.safeParseLong(friendshipMap.get("id2"));
         Friendship friendship = friendshipRepository.findOne(new Tuple<>(id1, id2));
-        return friendship != null ? friendship.toString() : "";
+        return friendship != null ? friendship.toString() : "Friendship not found!";
     }
 
     /**
@@ -140,6 +163,23 @@ public class FriendshipService extends NotificationService {
                 .map(Friendship::toString)
                 .collect(Collectors.toList());
         return list.size() != 0 ? list : new ArrayList<>(Collections.singletonList("The list of friendships is empty"));
+    }
+
+    /**
+     * Reads the friendship with the given notification ID.
+     *
+     * @param notificationID ID of notification.
+     * @return instance of friendship found or null if there is
+     * no friendship with the specified notification ID.
+     */
+    public Friendship readFriendshipByNotification(long notificationID) {
+        Iterable<Friendship> friendships = friendshipRepository.findAll();
+        for (Friendship friendship : friendships) {
+            if (friendship.getNotificationID() == notificationID) {
+                return friendship;
+            }
+        }
+        return null;
     }
 
     /**

@@ -15,6 +15,7 @@ public class UserDBRepository extends AbstractDBRepository<Long, User> implement
 
     public UserDBRepository(String url, String username, String password, Validator<User> validator) {
         super(validator, username, password, url);
+        this.findAll();
     }
 
     @Override

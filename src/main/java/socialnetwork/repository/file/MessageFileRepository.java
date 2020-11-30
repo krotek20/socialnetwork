@@ -10,7 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class MessageFileRepository extends AbstractFileRepository<Chat, Message> {
+public class MessageFileRepository extends AbstractFileRepository<Long, Message> {
     /**
      * Constructor
      * Creates the repository file if it doesn't exist, or reuses it
@@ -51,10 +51,10 @@ public class MessageFileRepository extends AbstractFileRepository<Chat, Message>
                 }
             }
         }
-        Chat chat = new Chat(toName);
+        Chat chat = new Chat(toName, 0);
         chat.setUsers(chatUsers);
 
-        Message message = new Message(from, chat, messageText, reply);
+        Message message = new Message(from, chat, messageText, reply, 0);
         message.setTimestamp(LocalDateTime.parse(timestamp));
         return message;
     }

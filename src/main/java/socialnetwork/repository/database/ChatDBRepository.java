@@ -19,6 +19,7 @@ public class ChatDBRepository extends AbstractDBRepository<Long, Chat> implement
     public ChatDBRepository(String url, String username, String password, Validator<Chat> validator) {
         super(validator, username, password, url);
         this.userDBRepository = new UserDBRepository(url, username, password, new UserValidator());
+        this.findAll();
     }
 
     @Override
