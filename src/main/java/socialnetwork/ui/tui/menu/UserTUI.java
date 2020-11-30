@@ -3,7 +3,6 @@ package socialnetwork.ui.tui.menu;
 import socialnetwork.domain.enums.Role;
 import socialnetwork.domain.dto.FriendshipDTO;
 import socialnetwork.service.UserService;
-import socialnetwork.ui.UI;
 import socialnetwork.ui.UIException;
 import socialnetwork.ui.tui.BaseTUI;
 
@@ -32,7 +31,7 @@ public class UserTUI extends BaseTUI {
         this.userService = userService;
         if (loggedUser != null) {
             if (loggedUser.getRole() == Role.ADMIN) {
-                generateTUI("User TUI", new HashMap<String, UI>() {{
+                generateTUI("User TUI", new HashMap<String, Runnable>() {{
                     put("Display all friends", UserTUI.this::displayAllFriends);
                     put("Display all users", UserTUI.this::displayAllUsers);
                     put("Search one user", UserTUI.this::searchOneUser);
@@ -40,7 +39,7 @@ public class UserTUI extends BaseTUI {
                     put("Delete user", UserTUI.this::deleteUser);
                 }});
             } else {
-                generateTUI("User TUI", new HashMap<String, UI>() {{
+                generateTUI("User TUI", new HashMap<String, Runnable>() {{
                     put("Display all friends", UserTUI.this::displayAllFriends);
                     put("Search one user", UserTUI.this::searchOneUser);
                     put("Delete account", UserTUI.this::deleteUser);
@@ -95,8 +94,11 @@ public class UserTUI extends BaseTUI {
      * Method that displays all friends of a User.
      * The {@code loggedUser} can decide either to filter his list of friends by month
      * and then display it or just to display the full list of his friends.
+     * If the list is empty, then it prints "No one here yet!".
+     *
+     * @throws UIException if the inserted option is invalid.
      */
-    private void displayAllFriends() {
+    private void displayAllFriends() throws UIException {
         String userID = (loggedUser.getRole() == Role.ADMIN ? readOne("id") : loggedUser.getID().toString());
         String request = readOne(OPTION_PREFIX + " Would you like to filter your friend list? [YES/NO]");
         List<FriendshipDTO> friends;
@@ -113,6 +115,10 @@ public class UserTUI extends BaseTUI {
                 throw new UIException("Please choose between YES or NO!");
         }
 
-        friends.forEach(System.out::println);
+        if (friends.size() == 0) {
+            System.out.println("No one here yet!");
+        } else {
+            friends.forEach(System.out::println);
+        }
     }
 }

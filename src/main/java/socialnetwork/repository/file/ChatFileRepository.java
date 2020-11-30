@@ -40,7 +40,7 @@ public class ChatFileRepository extends AbstractFileRepository<Long, Chat> {
                 }
             }
         }
-        Chat chat = new Chat(name);
+        Chat chat = new Chat(name, 0);
         chat.setID(Parse.safeParseLong(id));
         chat.setCount(Parse.safeParseLong(id));
         chat.setUsers(chatUsers);

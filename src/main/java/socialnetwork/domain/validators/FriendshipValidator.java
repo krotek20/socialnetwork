@@ -19,5 +19,9 @@ public class FriendshipValidator implements Validator<Friendship> {
         if (friendship.getID().getRight() == null) {
             throw new ValidationException("Right entity not instance of Entity");
         }
+        // validate notification ID
+        if (friendship.getNotificationID() < 1) {
+            throw new ValidationException("Invalid notification ID");
+        }
     }
 }

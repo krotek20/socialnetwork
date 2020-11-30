@@ -9,12 +9,14 @@ import socialnetwork.domain.validators.ValidationException;
 import socialnetwork.domain.validators.Validator;
 import socialnetwork.repository.Repository;
 import socialnetwork.repository.RepositoryException;
+import socialnetwork.ui.tui.BaseTUI;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class NotificationDBRepository
         extends AbstractDBRepository<Long, Notification>
@@ -24,34 +26,35 @@ public class NotificationDBRepository
     public NotificationDBRepository(String url, String username, String password, Validator<Notification> validator) {
         super(validator, username, password, url);
         this.userDBRepository = new UserDBRepository(url, username, password, new UserValidator());
+        this.findAll();
     }
 
     @Override
     public Notification extractEntity(ResultSet resultSet) throws SQLException {
         long id = resultSet.getLong("ID_NOTIFICATION");
         long fromID = resultSet.getLong("FROM_ID_USER");
-        long entityID = resultSet.getLong("ID_ENTITY");
         short typeShort = resultSet.getShort("NOTIFICATION_TYPE");
-        short shortStatus = resultSet.getShort("NOTIFICATION_STATUS");
+        String entityText = resultSet.getString("ENTITY_TEXT");
         String notificationText = resultSet.getString("NOTIFICATION_TEXT");
         LocalDateTime timestamp = resultSet.getTimestamp("NOTIFICATION_TIMESTAMP").toLocalDateTime();
 
-        Set<User> notifiedUsers = new HashSet<>();
+        Map<User, NotificationStatus> notifiedUsers = new HashMap<>();
         User from = userDBRepository.findOne(fromID);
         NotificationType type = NotificationType.fromValue(typeShort);
-        NotificationStatus status = NotificationStatus.fromValue(shortStatus);
 
-        Set<Long> usersID = super.getUsersID(String.format(
-                "select \"ID_USER\" from \"USERS_NOTIFICATIONS\" where \"ID_NOTIFICATION\" = %d", id));
-        for (long userID : usersID) {
-            notifiedUsers.add(userDBRepository.findOne(userID));
+        Map<Long, NotificationStatus> usersID = super.getNotifiedUsersID(String.format(
+                "select \"ID_USER\", \"NOTIFICATION_STATUS\" " +
+                        "from \"USERS_NOTIFICATIONS\" " +
+                        "where \"ID_NOTIFICATION\" = %d and \"NOTIFICATION_STATUS\" = %d",
+                id, NotificationStatus.toValue(NotificationStatus.UNSEEN)));
+        for (Map.Entry<Long, NotificationStatus> userID : usersID.entrySet()) {
+            notifiedUsers.put(userDBRepository.findOne(userID.getKey()), userID.getValue());
         }
 
-        Notification notification = new Notification(
-                notifiedUsers, from, entityID, type, notificationText, timestamp);
+        Notification notification = new Notification(from, entityText, type, notificationText, timestamp);
         notification.setID(id);
         notification.setCount(id);
-        notification.setStatus(status);
+        notification.setNotifiedUsers(notifiedUsers);
 
         return notification;
     }
@@ -75,14 +78,13 @@ public class NotificationDBRepository
             throw new RepositoryException("Notification already exists");
         }
         super.save(notification, String.format("insert into \"NOTIFICATIONS\" " +
-                        "values(%d, %d, %d, '%s', '%s'::timestamp, %d, %d)",
+                        "values(%d, %d, %d, '%s', '%s'::timestamp, '%s')",
                 notification.getID(), notification.getFrom().getID(),
-                NotificationType.toValue(notification.getType()),
-                notification.getNotificationText(), notification.getTimestamp(),
-                NotificationStatus.toValue(notification.getStatus()), notification.getEntityID()));
-        for (User user : notification.getNotifiedUsers()) {
-            super.save(notification, String.format("insert into \"USERS_NOTIFICATIONS\" values(%d, %d)",
-                    user.getID(), notification.getID()));
+                NotificationType.toValue(notification.getType()), notification.getNotificationText(),
+                notification.getTimestamp(), notification.getEntityText()));
+        for (Map.Entry<User, NotificationStatus> user : notification.getNotifiedUsers().entrySet()) {
+            super.save(notification, String.format("insert into \"USERS_NOTIFICATIONS\" values(%d, %d, %d)",
+                    user.getKey().getID(), notification.getID(), NotificationStatus.toValue(user.getValue())));
         }
         return null;
     }
@@ -97,8 +99,16 @@ public class NotificationDBRepository
         if (findOne(notification.getID()) == null) {
             throw new RepositoryException("ID is invalid");
         }
-        return super.update(notification, String.format("update \"NOTIFICATIONS\"" +
-                        "set \"NOTIFICATION_STATUS\" = %d where \"ID_NOTIFICATION\" = %d",
-                NotificationStatus.toValue(notification.getStatus()), notification.getID()));
+        return super.update(notification, String.format("update \"USERS_NOTIFICATIONS\" " +
+                        "set \"NOTIFICATION_STATUS\" = %d " +
+                        "where \"ID_NOTIFICATION\" = %d and \"ID_USER\" = %d",
+                NotificationStatus.toValue(NotificationStatus.SEEN), notification.getID(),
+                notification.getNotifiedUsers()
+                        .keySet()
+                        .stream()
+                        .filter(x -> x.getID().equals(BaseTUI.loggedUser.getID()))
+                        .collect(Collectors.toList())
+                        .get(0)
+                        .getID()));
     }
 }

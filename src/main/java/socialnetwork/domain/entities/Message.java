@@ -13,8 +13,8 @@ public class Message implements Entity<Long> {
     private long id;
     private Chat to;
     private User from;
-    private String messageText;
     private String reply;
+    private String messageText;
     private LocalDateTime timestamp;
 
     public Message(User from, Chat to, String message, String reply, long notificationID) {

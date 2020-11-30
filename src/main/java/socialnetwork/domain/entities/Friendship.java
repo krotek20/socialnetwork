@@ -13,7 +13,8 @@ public class Friendship implements Entity<Tuple<Long, Long>> {
     private FriendshipStatus status;
     private Tuple<Long, Long> id;
 
-    public Friendship(Long id1, Long id2) {
+    public Friendship(long id1, long id2, long notificationID) {
+        this.notificationID = notificationID;
         this.id = new Tuple<>(id1, id2);
         this.date = LocalDateTime.now();
         this.status = FriendshipStatus.PENDING;

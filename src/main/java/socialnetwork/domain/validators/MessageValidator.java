@@ -13,8 +13,8 @@ public class MessageValidator implements Validator<Message> {
         if (message.getFrom() == null) {
             throw new ValidationException("From not instance of User");
         }
-        // validate to
-        if (message.getID() == null) {
+        // validate chat
+        if (message.getChat() == null) {
             throw new ValidationException("To not instance of chat");
         }
         // validate timestamp
@@ -24,6 +24,10 @@ public class MessageValidator implements Validator<Message> {
         // validate message
         if (message.getMessageText().equals("")) {
             throw new ValidationException("Invalid message!");
+        }
+        // validate notification ID
+        if (message.getNotificationID() < 1) {
+            throw new ValidationException("Invalid notification ID");
         }
     }
 }

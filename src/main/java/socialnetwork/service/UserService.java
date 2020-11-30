@@ -53,23 +53,6 @@ public class UserService {
     }
 
     /**
-     * Finds all friendships of the user with the given id.
-     *
-     * @param id id of the user
-     * @return list of the current user's friendships.
-     */
-    private List<Friendship> findFriendships(Long id) {
-        Iterable<Friendship> friendships = friendshipRepository.findAll();
-        List<Friendship> currentUserFriendships = new ArrayList<>();
-        for (Friendship friendship : friendships) {
-            if (friendship.getID().getLeft().equals(id) || friendship.getID().getRight().equals(id)) {
-                currentUserFriendships.add(friendship);
-            }
-        }
-        return currentUserFriendships;
-    }
-
-    /**
      * Creates a new user from the input data.
      *
      * @param userMap key-value pairs corresponding to the users
@@ -94,7 +77,7 @@ public class UserService {
     }
 
     /**
-     * Read the user with the given ID.
+     * Reads the user with the given ID.
      *
      * @param id number representing the user ID
      * @return found user as string
@@ -105,14 +88,14 @@ public class UserService {
     public String readOneUser(String id) throws RepositoryException, ServiceException {
         User user = userRepository.findOne(Parse.safeParseLong(id));
         if (user == null) {
-            throw new ServiceException("User not found!");
+            throw new RepositoryException("User not found!");
         }
         return convertToUserDTO(user).toString();
 
     }
 
     /**
-     * Read all users.
+     * Reads all users.
      *
      * @return a string list of all users.
      */
@@ -122,6 +105,23 @@ public class UserService {
                 .map(UserDTO::toString)
                 .collect(Collectors.toList());
         return list.size() != 0 ? list : new ArrayList<>(Collections.singletonList("The list of users is empty"));
+    }
+
+    /**
+     * Finds all friendships of the user with the given id.
+     *
+     * @param id id of the user
+     * @return list of the current user's friendships.
+     */
+    private List<Friendship> findFriendships(Long id) {
+        Iterable<Friendship> friendships = friendshipRepository.findAll();
+        List<Friendship> currentUserFriendships = new ArrayList<>();
+        for (Friendship friendship : friendships) {
+            if (friendship.getID().getLeft().equals(id) || friendship.getID().getRight().equals(id)) {
+                currentUserFriendships.add(friendship);
+            }
+        }
+        return currentUserFriendships;
     }
 
     /**

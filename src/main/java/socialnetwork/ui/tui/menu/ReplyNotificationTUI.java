@@ -1,16 +1,17 @@
 package socialnetwork.ui.tui.menu;
 
-import socialnetwork.domain.dto.NotificationDTO;
+import socialnetwork.Utils.Constants;
+import socialnetwork.domain.entities.Friendship;
+import socialnetwork.domain.entities.Message;
 import socialnetwork.domain.entities.Notification;
-import socialnetwork.domain.entities.User;
 import socialnetwork.service.FriendshipService;
 import socialnetwork.service.MessageService;
+import socialnetwork.service.NotificationService;
 import socialnetwork.ui.UI;
 import socialnetwork.ui.UIException;
 import socialnetwork.ui.tui.BaseTUI;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -24,6 +25,7 @@ import java.util.Map;
  */
 public class ReplyNotificationTUI extends BaseTUI {
     private final Map<String, Notification> notificationsHelper;
+    private final NotificationService notificationService;
     private final FriendshipService friendshipService;
     private final MessageService messageService;
 
@@ -39,14 +41,16 @@ public class ReplyNotificationTUI extends BaseTUI {
      * @param friendshipService   instance of {@code FriendshipService}.
      * @param notificationsHelper Map with all {@code loggedUser} notifications.
      */
-    public ReplyNotificationTUI(FriendshipService friendshipService,
+    public ReplyNotificationTUI(NotificationService notificationService,
+                                FriendshipService friendshipService,
                                 MessageService messageService,
                                 Map<String, Notification> notificationsHelper) {
         this.notificationsHelper = notificationsHelper;
+        this.notificationService = notificationService;
         this.friendshipService = friendshipService;
         this.messageService = messageService;
 
-        generateTUI("Notification TUI", new HashMap<String, UI>() {{
+        generateTUI("Notification TUI", new HashMap<String, Runnable>() {{
             put("Read notification", ReplyNotificationTUI.this::displayOneNotification);
             put("Reply to notification", ReplyNotificationTUI.this::replyToNotification);
         }});
@@ -56,78 +60,84 @@ public class ReplyNotificationTUI extends BaseTUI {
      * Method that displays a notification via. its ID
      * from {@code notificationsHelper}. This function will
      * print out the notification requested data via. {@code NotificationDTO}
+     *
+     * @throws UIException if the input id is invalid.
      */
-    private void displayOneNotification() {
+    private void displayOneNotification() throws UIException {
         String id = readOne("id");
         Notification notification = notificationsHelper.get(id);
-        NotificationDTO notificationDTO = new NotificationDTO(notification.getFriendship(), notification.getMessage());
-        notificationDTO.setFrom(notification.getFrom());
-        if (notification.getFriendship() == null) {
-            notificationDTO.setTimestamp(notification.getMessage().getTimestamp());
-            notificationDTO.setMessageText(notification.getMessage().getMessageText());
+        if (notification == null) {
+            throw new UIException("Invalid ID");
         }
-        System.out.println(notificationDTO);
+        System.out.println(notification.getEntityText());
     }
 
     /**
-     * Method that handle replying to a notification
+     * Method that handle the reply to a notification functionality
      * via. its ID from {@code notificationsHelper}.
+     *
+     * @throws UIException if the input id is invalid.
      */
-    private void replyToNotification() {
+    private void replyToNotification() throws UIException {
         String id = readOne("id");
         Notification notification = notificationsHelper.get(id);
-        if (notification.getFriendship() == null) {
-            replyMessage(notification);
-        } else {
-            replyFriendRequest(notification);
+        if (notification == null) {
+            throw new UIException("Invalid ID");
         }
+
+        switch (notification.getType()) {
+            case MESSAGE:
+                replyMessage(notification);
+                break;
+            case FRIENDSHIP:
+                replyFriendRequest(notification);
+                break;
+            case CHAT:
+                break;
+            default:
+                throw new UIException("Invalid option!");
+        }
+        notificationService.updateSeenNotification(notification);
     }
 
     /**
-     * This Method will handle replying a message notification.
+     * This Method will handle the reply functionality for a message.
      *
      * @param notification the Notification the {@code loggedUser}
      *                     wants to reply to. It should store a {@code Message} entity.
      */
     private void replyMessage(Notification notification) {
-        Map<String, String> chatMap;
-        List<User> chatUsers = notification.getMessage().getID().getUsers();
-        String to = null;
-        for (User user : chatUsers) {
-            if (!user.getID().equals(loggedUser.getID())) {
-                to = user.getID().toString();
-            }
-        }
-        chatMap = readMap("message");
-        chatMap.put("to", to);
-        chatMap.put("reply", notification.getMessage().getMessageText());
+        Message message = messageService.readMessageByNotification(notification.getID());
+        Map<String, String> chatMap = readMap("message");
+
+        chatMap.put("to", message.getChat().getID().toString());
+        chatMap.put("reply", message.getMessageText());
+
         System.out.println("Sending...");
-        System.out.println("Message sent at " + messageService.sendMessage(loggedUser, chatMap).getTimestamp());
+        System.out.println("Message sent at " +
+                messageService.sendMessage(loggedUser, chatMap).getTimestamp()
+                        .format(Constants.DATE_TIME_FORMATTER));
     }
 
     /**
-     * This Method will handle replying a friend request notification.
-     * If the {@code loggedUser} inserts "YES" then the new friendship will be created and stored;
-     * otherwise prints "Okay".
+     * This Method will handle the reply functionality for a friend request.
+     * If the {@code loggedUser} inserts "YES" then the friendship
+     * will be APPROVED; otherwise prints it will be REJECTED.
      *
-     * @param notification the Notification the {@code loggedUser}
-     *                     wants to reply to. It should store a {@code Friendship} entity.
+     * @param notification the Notification the {@code loggedUser} wants to reply to.
+     * @throws UIException if the insert option is not YES or NO.
      */
-    private void replyFriendRequest(Notification notification) {
+    private void replyFriendRequest(Notification notification) throws UIException {
+        Friendship friendship = friendshipService.readFriendshipByNotification(notification.getID());
         String request = readOne(OPTION_PREFIX + "Accept this friend request? [YES/NO]");
-        switch (request.toUpperCase()) {
+        switch (request.toUpperCase().trim()) {
             case "YES":
-                String id1 = notification.getFriendship().getID().getLeft().toString();
-                String id2 = notification.getFriendship().getID().getRight().toString();
-                Map<String, String> friendshipMap = new HashMap<String, String>() {{
-                    put("id1", id1);
-                    put("id2", id2);
-                }};
-                friendshipService.addFriendship(friendshipMap);
+                friendshipService.acceptFriendship(friendship);
                 System.out.println("Friendship created!");
                 break;
             case "NO":
-                System.out.println("Okay");
+                friendshipService.rejectFriendship(friendship);
+                System.out.println("Friendship rejected!");
                 break;
             default:
                 throw new UIException("Please choose between YES or NO!");

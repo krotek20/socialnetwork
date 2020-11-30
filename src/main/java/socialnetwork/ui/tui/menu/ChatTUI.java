@@ -1,8 +1,8 @@
 package socialnetwork.ui.tui.menu;
 
+import socialnetwork.Utils.Constants;
 import socialnetwork.service.ChatService;
 import socialnetwork.service.MessageService;
-import socialnetwork.ui.UI;
 import socialnetwork.ui.tui.BaseTUI;
 
 import java.util.HashMap;
@@ -16,9 +16,10 @@ public class ChatTUI extends BaseTUI {
         this.messageService = messageService;
         this.chatService = chatService;
         if (loggedUser != null) {
-            generateTUI("Chat TUI", new HashMap<String, UI>() {{
-                put("Send new message", ChatTUI.this::sendMessage);
+            generateTUI("Chat TUI", new HashMap<String, Runnable>() {{
                 put("Display all messages", ChatTUI.this::displayAllMessages);
+                put("Display all chats", ChatTUI.this::displayAllChats);
+                put("Send new message", ChatTUI.this::sendMessage);
                 put("Create new chat", ChatTUI.this::createChat);
             }});
         }
@@ -28,12 +29,20 @@ public class ChatTUI extends BaseTUI {
         Map<String, String> chatMap = readMap("to", "message");
         chatMap.put("reply", null);
         System.out.println("Sending...");
-        System.out.println("Message sent at " + messageService.sendMessage(loggedUser, chatMap).getTimestamp());
+        System.out.println("Message sent at " +
+                messageService.sendMessage(loggedUser, chatMap).getTimestamp()
+                        .format(Constants.DATE_TIME_FORMATTER));
     }
 
     private void displayAllMessages() {
         String chatID = readOne("id");
         System.out.println(messageService.readAllMessages(loggedUser, chatID));
+    }
+
+    private void displayAllChats() {
+        for (String chat : chatService.readAllChats(loggedUser)) {
+            System.out.println(chat);
+        }
     }
 
     private void createChat() {
@@ -48,6 +57,8 @@ public class ChatTUI extends BaseTUI {
             chatMap.put("id" + count++, userID);
         }
 
-        System.out.println("Operation " + (chatService.createChat(name, chatMap) ? "successful" : "failed"));
+        System.out.println("Operation " +
+                (chatService.createChat(name, chatMap, loggedUser) ?
+                        "successful" : "failed"));
     }
 }

@@ -22,6 +22,7 @@ public class MessageDBRepository extends AbstractDBRepository<Long, Message> imp
         super(validator, username, password, url);
         this.userDBRepository = new UserDBRepository(url, username, password, new UserValidator());
         this.chatDBRepository = new ChatDBRepository(url, username, password, new ChatValidator());
+        this.findAll();
     }
 
     @Override
