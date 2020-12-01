@@ -3,10 +3,7 @@ package socialnetwork.ui.gui.controllers;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import socialnetwork.domain.entities.User;
@@ -53,7 +50,7 @@ public class LoginController {
 
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(getClass().getResource("/views/mainLayout.fxml"));
-            AnchorPane root = loader.load();
+            TabPane root = loader.load();
 
             Stage mainStage = new Stage();
             mainStage.setTitle("Main");
