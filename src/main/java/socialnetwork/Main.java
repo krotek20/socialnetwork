@@ -12,6 +12,7 @@ import socialnetwork.repository.database.*;
 import socialnetwork.service.*;
 
 import socialnetwork.ui.UI;
+import socialnetwork.ui.gui.MainGUI;
 import socialnetwork.ui.tui.login.LoginTUI;
 
 public class Main {
@@ -45,12 +46,12 @@ public class Main {
         NotificationService notificationService = new NotificationService(
                 notificationDBRepository);
 
-
         // UI
-        UI loginUI = new LoginTUI(userService, friendshipService, messageService, notificationService, chatService);
+        UI mainUI = MainGUI.getInstance(userService, chatService,
+                messageService, friendshipService, notificationService);
 
         // RUN APPLICATION
-        loginUI.run();
+        mainUI.run();
     }
 }
 
