@@ -1,6 +1,11 @@
 package socialnetwork.service;
 
+import socialnetwork.Utils.Events.ChangeEventType;
+import socialnetwork.Utils.Events.FriendshipChangeEvent;
+import socialnetwork.Utils.Events.UsersChangeEvent;
 import socialnetwork.Utils.Graph;
+import socialnetwork.Utils.Observer.Observable;
+import socialnetwork.Utils.Observer.Observer;
 import socialnetwork.Utils.Parse;
 import socialnetwork.domain.*;
 import socialnetwork.domain.entities.Chat;
@@ -22,10 +27,12 @@ import java.util.stream.StreamSupport;
  * Friendship service class
  * Main friendship functionalities are implemented here.
  */
-public class FriendshipService extends NotificationService {
+public class FriendshipService extends NotificationService implements Observable<FriendshipChangeEvent> {
     private final Repository<Tuple<Long, Long>, Friendship> friendshipRepository;
     private final Repository<Long, Chat> chatRepository;
     private final Repository<Long, User> userRepository;
+
+    private List<Observer<FriendshipChangeEvent>> observers = new ArrayList<>();
 
     public FriendshipService(Repository<Tuple<Long, Long>, Friendship> friendshipRepository,
                              Repository<Long, User> userRepository,
@@ -97,7 +104,9 @@ public class FriendshipService extends NotificationService {
         User secondFriend = userRepository.findOne(friendship.getID().getRight());
         createChatBetweenFriends(new Tuple<>(firstFriend, secondFriend));
         friendship.setStatus(FriendshipStatus.APPROVED);
+
         friendshipRepository.update(friendship);
+        notifyObservers(new FriendshipChangeEvent(ChangeEventType.UPDATE, friendship));
     }
 
     /**
@@ -111,6 +120,7 @@ public class FriendshipService extends NotificationService {
             throws ValidationException, RepositoryException {
         friendship.setStatus(FriendshipStatus.REJECTED);
         friendshipRepository.update(friendship);
+        notifyObservers(new FriendshipChangeEvent(ChangeEventType.UPDATE, friendship));
     }
 
     /**
@@ -229,5 +239,20 @@ public class FriendshipService extends NotificationService {
     public List<Long> getLargestCommunity() {
         Graph graph = computeGraph();
         return graph.getLargestComponent();
+    }
+
+    @Override
+    public void addObserver(Observer<FriendshipChangeEvent> e) {
+        observers.add(e);
+    }
+
+    @Override
+    public void removeObserver(Observer<FriendshipChangeEvent> e) {
+        observers.remove(e);
+    }
+
+    @Override
+    public void notifyObservers(FriendshipChangeEvent t) {
+        observers.stream().forEach(x -> x.update(t));
     }
 }

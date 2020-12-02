@@ -55,6 +55,9 @@ public class LoginController {
             Stage mainStage = new Stage();
             mainStage.setTitle("Main");
 
+            MainController mainController = loader.getController();
+            mainController.setServices();
+
             Scene mainScene = new Scene(root);
             mainStage.setScene(mainScene);
             mainStage.show();

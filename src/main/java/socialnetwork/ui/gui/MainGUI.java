@@ -11,6 +11,8 @@ import javafx.stage.Stage;
 import socialnetwork.service.*;
 import socialnetwork.ui.UI;
 
+import java.io.IOException;
+
 public class MainGUI extends Application implements UI {
     private static UserService userService;
     private static ChatService chatService;
@@ -67,6 +69,8 @@ public class MainGUI extends Application implements UI {
     public void run() {
         main(null);
     }
+
+
 
     public static void main(String[] args) {
         launch(args);
