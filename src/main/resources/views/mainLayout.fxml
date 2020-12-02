@@ -3,19 +3,37 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<TabPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/11.0.1">
+<TabPane fx:id="tabPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="socialnetwork.ui.gui.controllers.MainController">
   <tabs>
-    <Tab text="Account">
+    <Tab fx:id="accountTab" text="Account">
+      <content>
+        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="371.0" prefWidth="600.0">
+               <children>
+                  <Button fx:id="addFriendButton" layoutX="78.0" layoutY="302.0" mnemonicParsing="false" onMouseClicked="#handleAddFriend" text="Add Friend" />
+                  <TableView fx:id="usersTable" layoutX="38.0" layoutY="76.0" prefHeight="205.0" prefWidth="154.0">
+                    <columns>
+                      <TableColumn fx:id="tableColumnName" prefWidth="75.0" text="Last name" />
+                      <TableColumn fx:id="tableColumnSurname" prefWidth="75.0" text="First name" />
+                    </columns>
+                  </TableView>
+                  <TextField fx:id="filterFriendsTextField" layoutX="401.0" layoutY="30.0" onKeyTyped="#filterFriends" />
+                  <TableView fx:id="friendsTable" layoutX="399.0" layoutY="76.0" prefHeight="200.0" prefWidth="153.0">
+                    <columns>
+                      <TableColumn fx:id="friendsTableColumnName" prefWidth="78.0" text="Last name" />
+                      <TableColumn fx:id="friendsTableColumnSurname" prefWidth="72.0" text="First name" />
+                    </columns>
+                  </TableView>
+                  <Button layoutX="428.0" layoutY="302.0" mnemonicParsing="false" text="Remove Friend" />
+                  <TextField fx:id="filterUsersTextField" layoutX="41.0" layoutY="30.0" onKeyTyped="#filterUsers" />
+               </children></AnchorPane>
+      </content>
+    </Tab>
+    <Tab fx:id="notificationsTab" text="Notifications">
       <content>
         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
       </content>
     </Tab>
-    <Tab text="Notifications">
-      <content>
-        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-      </content>
-    </Tab>
-      <Tab text="Chats">
+      <Tab fx:id="chatsTab" text="Chats">
           <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
           </content>

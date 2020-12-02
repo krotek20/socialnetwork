@@ -1,5 +1,9 @@
 package socialnetwork.service;
 
+import socialnetwork.Utils.Events.ChangeEventType;
+import socialnetwork.Utils.Events.UsersChangeEvent;
+import socialnetwork.Utils.Observer.Observable;
+import socialnetwork.Utils.Observer.Observer;
 import socialnetwork.Utils.Parse;
 import socialnetwork.domain.entities.Friendship;
 import socialnetwork.domain.enums.Gender;
@@ -11,6 +15,7 @@ import socialnetwork.domain.validators.ValidationException;
 import socialnetwork.repository.Repository;
 import socialnetwork.repository.RepositoryException;
 
+
 import java.time.LocalDate;
 
 import java.util.*;
@@ -21,9 +26,12 @@ import java.util.stream.StreamSupport;
  * User service class
  * Main user functionalities are implemented here
  */
-public class UserService {
+public class UserService implements Observable<UsersChangeEvent> {
+    //TODO
     private final Repository<Long, User> userRepository;
     private final Repository<Tuple<Long, Long>, Friendship> friendshipRepository;
+
+    private List<Observer<UsersChangeEvent>> observers = new ArrayList<>();
 
     public UserService(Repository<Long, User> userRepository,
                        Repository<Tuple<Long, Long>, Friendship> friendshipRepository) {
@@ -73,6 +81,9 @@ public class UserService {
                 gender
         );
         user.setCount(user.getID());
+        if(userRepository.save(user) == null){
+            notifyObservers(new UsersChangeEvent(ChangeEventType.ADD, user));
+        }
         return userRepository.save(user) == null;
     }
 
@@ -108,12 +119,38 @@ public class UserService {
     }
 
     /**
+     * Returns the user with the given ID.
+     *
+     * @param id number representing the user ID
+     * @return found user as string
+     * @throws RepositoryException when id string is empty or contains an invalid number.
+     * @throws ServiceException    when id is not a Long parsable value
+     *                             or when the founded user is null.
+     */
+    public User findOneUser(String id) throws RepositoryException, ServiceException {
+        User user = userRepository.findOne(Parse.safeParseLong(id));
+        if (user == null) {
+            throw new RepositoryException("User not found!");
+        }
+        return user;
+    }
+
+    /**
+     * Returns all users.
+     *
+     * @return an iterable with all users
+     */
+    public Iterable<User> findAllUsers() {
+        return userRepository.findAll();
+    }
+
+    /**
      * Finds all friendships of the user with the given id.
      *
      * @param id id of the user
      * @return list of the current user's friendships.
      */
-    private List<Friendship> findFriendships(Long id) {
+    public List<Friendship> findFriendships(Long id) {
         Iterable<Friendship> friendships = friendshipRepository.findAll();
         List<Friendship> currentUserFriendships = new ArrayList<>();
         for (Friendship friendship : friendships) {
@@ -224,5 +261,20 @@ public class UserService {
                         .stream()
                         .map(x -> convertToFriendshipDTO(x, userID))
                         .collect(Collectors.toList()));
+    }
+
+    @Override
+    public void addObserver(Observer<UsersChangeEvent> e) {
+        observers.add(e);
+    }
+
+    @Override
+    public void removeObserver(Observer<UsersChangeEvent> e) {
+        observers.remove(e);
+    }
+
+    @Override
+    public void notifyObservers(UsersChangeEvent t) {
+        observers.stream().forEach(x -> x.update(t));
     }
 }
