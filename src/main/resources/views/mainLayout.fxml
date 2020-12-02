@@ -2,6 +2,7 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
 <TabPane fx:id="tabPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="socialnetwork.ui.gui.controllers.MainController">
   <tabs>
@@ -9,22 +10,32 @@
       <content>
         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="371.0" prefWidth="600.0">
                <children>
-                  <Button fx:id="addFriendButton" layoutX="78.0" layoutY="302.0" mnemonicParsing="false" onMouseClicked="#handleAddFriend" text="Add Friend" />
-                  <TableView fx:id="usersTable" layoutX="38.0" layoutY="76.0" prefHeight="205.0" prefWidth="154.0">
+                  <Button fx:id="addFriendButton" layoutX="79.0" layoutY="315.0" mnemonicParsing="false" onMouseClicked="#handleAddFriend" text="Add Friend" />
+                  <TableView fx:id="usersTable" layoutX="39.0" layoutY="97.0" onMouseClicked="#showAddButton" prefHeight="205.0" prefWidth="151.0">
                     <columns>
-                      <TableColumn fx:id="tableColumnName" prefWidth="75.0" text="Last name" />
-                      <TableColumn fx:id="tableColumnSurname" prefWidth="75.0" text="First name" />
+                      <TableColumn fx:id="tableColumnName" prefWidth="74.0" text="Last name" />
+                      <TableColumn fx:id="tableColumnSurname" prefWidth="76.0" text="First name" />
                     </columns>
                   </TableView>
                   <TextField fx:id="filterFriendsTextField" layoutX="401.0" layoutY="30.0" onKeyTyped="#filterFriends" />
-                  <TableView fx:id="friendsTable" layoutX="399.0" layoutY="76.0" prefHeight="200.0" prefWidth="153.0">
+                  <TableView fx:id="friendsTable" layoutX="399.0" layoutY="100.0" onMouseClicked="#showRemoveButton" prefHeight="200.0" prefWidth="151.0">
                     <columns>
                       <TableColumn fx:id="friendsTableColumnName" prefWidth="78.0" text="Last name" />
                       <TableColumn fx:id="friendsTableColumnSurname" prefWidth="72.0" text="First name" />
                     </columns>
                   </TableView>
-                  <Button layoutX="428.0" layoutY="302.0" mnemonicParsing="false" text="Remove Friend" />
+                  <Button fx:id="deleteFriendButton" layoutX="428.0" layoutY="315.0" mnemonicParsing="false" onMouseClicked="#handleRemoveFriendButton" text="Remove Friend" />
                   <TextField fx:id="filterUsersTextField" layoutX="41.0" layoutY="30.0" onKeyTyped="#filterUsers" />
+                  <Label alignment="CENTER" contentDisplay="CENTER" layoutX="80.0" layoutY="65.0" prefHeight="32.0" prefWidth="72.0" text="USERS" textAlignment="CENTER" textOverrun="CLIP">
+                     <font>
+                        <Font name="Arial Bold" size="15.0" />
+                     </font>
+                  </Label>
+                  <Label alignment="CENTER" layoutX="432.0" layoutY="73.0" text="FRIENDLIST">
+                     <font>
+                        <Font name="Arial Bold" size="15.0" />
+                     </font>
+                  </Label>
                </children></AnchorPane>
       </content>
     </Tab>

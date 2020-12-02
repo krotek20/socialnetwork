@@ -7,6 +7,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import socialnetwork.Utils.Events.FriendshipChangeEvent;
 import socialnetwork.Utils.Events.UsersChangeEvent;
 import socialnetwork.Utils.Observer.Observer;
 import socialnetwork.domain.entities.Friendship;
@@ -66,6 +67,8 @@ public class MainController implements Observer<UsersChangeEvent> {
     @FXML
     private Button addFriendButton;
 
+    @FXML Button deleteFriendButton;
+
     public void setServices(){
         this.userService = MainGUI.getUserService();
         this.friendshipService = MainGUI.getFriendshipService();
@@ -75,6 +78,8 @@ public class MainController implements Observer<UsersChangeEvent> {
 
     @FXML
     public void initialize(){
+        addFriendButton.setVisible(false);
+        deleteFriendButton.setVisible(false);
         tableColumnName.setCellValueFactory(new PropertyValueFactory<User, String>("lastName"));
         tableColumnSurname.setCellValueFactory(new PropertyValueFactory<User, String>("firstName"));
         usersTable.setItems(usersModel);
@@ -117,7 +122,6 @@ public class MainController implements Observer<UsersChangeEvent> {
     }
 
     public void handleAddFriend(MouseEvent mouseEvent) {
-        addFriendButton.setDisable(true);
 
         User user = usersTable.getSelectionModel().getSelectedItem();
 
@@ -139,7 +143,7 @@ public class MainController implements Observer<UsersChangeEvent> {
             }
         }
 
-        addFriendButton.setDisable(false);
+        addFriendButton.setVisible(false);
     }
 
 
@@ -171,5 +175,35 @@ public class MainController implements Observer<UsersChangeEvent> {
                 .filter(x -> (x.getFirstName() + " " + x.getLastName()).toLowerCase().contains(filter.toLowerCase()))
                 .collect(Collectors.toList());
         friendsModel.setAll(friendList);
+    }
+
+    public void handleRemoveFriendButton(MouseEvent mouseEvent) {
+        User friend = friendsTable.getSelectionModel().getSelectedItem();
+
+        if(friend == null){
+            AlertBox.showErrorMessage(null, "No selected friend!");
+        }
+        else{
+            String id2 = friend.getID().toString();
+            String id1 = LoginController.loggedUser.getID().toString();
+            Map<String,String> friendshipMap = new HashMap<String, String>();
+            friendshipMap.put("id1",id1);
+            friendshipMap.put("id2",id2);
+            boolean rez = friendshipService.deleteFriendship(friendshipMap);
+            if(rez)
+                AlertBox.showMessage(null, Alert.AlertType.CONFIRMATION, "Friend removed!",
+                        friend.getLastName() + " " + friend.getFirstName()+" has been removed from your friend list.");
+            else
+                AlertBox.showErrorMessage(null, "An error occured.");
+        }
+        initModel();
+        deleteFriendButton.setVisible(false);
+    }
+
+    public void showAddButton(MouseEvent mouseEvent) {
+        addFriendButton.setVisible(true);
+    }
+    public void showRemoveButton(MouseEvent mouseEvent) {
+        deleteFriendButton.setVisible(true);
     }
 }
