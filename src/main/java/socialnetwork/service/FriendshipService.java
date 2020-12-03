@@ -1,12 +1,8 @@
 package socialnetwork.service;
 
-import socialnetwork.Utils.Events.ChangeEventType;
-import socialnetwork.Utils.Events.FriendshipChangeEvent;
-import socialnetwork.Utils.Events.UsersChangeEvent;
 import socialnetwork.Utils.Graph;
-import socialnetwork.Utils.Observer.Observable;
-import socialnetwork.Utils.Observer.Observer;
 import socialnetwork.Utils.Parse;
+import socialnetwork.Utils.design.Observable;
 import socialnetwork.domain.*;
 import socialnetwork.domain.entities.Chat;
 import socialnetwork.domain.entities.Friendship;
@@ -27,18 +23,14 @@ import java.util.stream.StreamSupport;
  * Friendship service class
  * Main friendship functionalities are implemented here.
  */
-public class FriendshipService extends NotificationService implements Observable<FriendshipChangeEvent> {
+public class FriendshipService extends Observable {
     private final Repository<Tuple<Long, Long>, Friendship> friendshipRepository;
     private final Repository<Long, Chat> chatRepository;
     private final Repository<Long, User> userRepository;
 
-    private List<Observer<FriendshipChangeEvent>> observers = new ArrayList<>();
-
     public FriendshipService(Repository<Tuple<Long, Long>, Friendship> friendshipRepository,
                              Repository<Long, User> userRepository,
-                             Repository<Long, Chat> chatRepository,
-                             Repository<Long, Notification> notificationRepository) {
-        super(notificationRepository);
+                             Repository<Long, Chat> chatRepository) {
         this.friendshipRepository = friendshipRepository;
         this.userRepository = userRepository;
         this.chatRepository = chatRepository;
@@ -77,11 +69,12 @@ public class FriendshipService extends NotificationService implements Observable
      * @throws ValidationException when chat data are not valid.
      */
     private void createChatBetweenFriends(Tuple<User, User> friends) throws ValidationException {
-        Notification notification = super.createNotification(Set.of(friends.getLeft()), friends.getRight(),
+        Notification notification = NotificationService.createNotification(
+                Set.of(friends.getLeft()), friends.getRight(),
                 String.format("You and %s %s are friends now. Start a new conversation in the private chat!",
                         friends.getRight().getFirstName(), friends.getRight().getLastName()),
                 NotificationType.CHAT, "New chat!", LocalDateTime.now());
-        super.updateSeenNotification(notification);
+        NotificationService.updateSeenNotification(notification);
 
         Chat chat = new Chat(friends.getLeft().getFirstName() + ", " + friends.getRight().getFirstName(),
                 notification.getID());
@@ -106,7 +99,8 @@ public class FriendshipService extends NotificationService implements Observable
         friendship.setStatus(FriendshipStatus.APPROVED);
 
         friendshipRepository.update(friendship);
-        notifyObservers(new FriendshipChangeEvent(ChangeEventType.UPDATE, friendship));
+        setChanged();
+        notifyObservers();
     }
 
     /**
@@ -120,7 +114,8 @@ public class FriendshipService extends NotificationService implements Observable
             throws ValidationException, RepositoryException {
         friendship.setStatus(FriendshipStatus.REJECTED);
         friendshipRepository.update(friendship);
-        notifyObservers(new FriendshipChangeEvent(ChangeEventType.UPDATE, friendship));
+        setChanged();
+        notifyObservers();
     }
 
     /**
@@ -138,7 +133,7 @@ public class FriendshipService extends NotificationService implements Observable
     public boolean requestFriendship(Map<String, String> friendshipMap)
             throws ValidationException, RepositoryException, ServiceException {
         Tuple<User, User> newFriends = localValidation(friendshipMap);
-        Notification notification = super.createNotification(
+        Notification notification = NotificationService.createNotification(
                 Set.of(newFriends.getLeft()), newFriends.getRight(), String.format(
                         "%s %s sent you a friend request",
                         newFriends.getRight().getFirstName(), newFriends.getRight().getLastName()),
@@ -205,8 +200,9 @@ public class FriendshipService extends NotificationService implements Observable
         long id2 = Parse.safeParseLong(friendshipMap.get("id2"));
         Friendship friendship = friendshipRepository.findOne(new Tuple<>(id1, id2));
         boolean status = friendshipRepository.delete(new Tuple<>(id1, id2)) != null;
-        if(status){
-            notifyObservers(new FriendshipChangeEvent(ChangeEventType.DELETE, friendship));
+        if (status) {
+            setChanged();
+            notifyObservers();
         }
         return status;
     }
@@ -244,20 +240,5 @@ public class FriendshipService extends NotificationService implements Observable
     public List<Long> getLargestCommunity() {
         Graph graph = computeGraph();
         return graph.getLargestComponent();
-    }
-
-    @Override
-    public void addObserver(Observer<FriendshipChangeEvent> e) {
-        observers.add(e);
-    }
-
-    @Override
-    public void removeObserver(Observer<FriendshipChangeEvent> e) {
-        observers.remove(e);
-    }
-
-    @Override
-    public void notifyObservers(FriendshipChangeEvent t) {
-        observers.stream().forEach(x -> x.update(t));
     }
 }

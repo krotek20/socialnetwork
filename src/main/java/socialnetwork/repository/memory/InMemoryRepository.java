@@ -1,9 +1,7 @@
 package socialnetwork.repository.memory;
 
-import socialnetwork.design.Observable;
+import socialnetwork.Utils.design.Observable;
 import socialnetwork.domain.Entity;
-import socialnetwork.domain.entities.Message;
-import socialnetwork.domain.entities.Notification;
 import socialnetwork.domain.validators.ValidationException;
 import socialnetwork.domain.validators.Validator;
 import socialnetwork.repository.Repository;
