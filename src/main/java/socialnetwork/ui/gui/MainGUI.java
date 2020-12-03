@@ -3,15 +3,10 @@ package socialnetwork.ui.gui;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import socialnetwork.service.*;
 import socialnetwork.ui.UI;
-
-import java.io.IOException;
 
 public class MainGUI extends Application implements UI {
     private static UserService userService;
@@ -69,7 +64,6 @@ public class MainGUI extends Application implements UI {
     public void run() {
         main(null);
     }
-
 
 
     public static void main(String[] args) {
