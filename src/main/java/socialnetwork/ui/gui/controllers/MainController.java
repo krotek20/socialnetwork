@@ -3,10 +3,14 @@ package socialnetwork.ui.gui.controllers;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.BorderPane;
+import javafx.stage.Stage;
 import socialnetwork.Utils.Constants;
 import socialnetwork.Utils.design.Observable;
 import socialnetwork.Utils.design.Observer;
@@ -20,6 +24,7 @@ import socialnetwork.service.NotificationService;
 import socialnetwork.service.UserService;
 import socialnetwork.ui.gui.MainGUI;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,6 +64,8 @@ public class MainController implements Observer {
     private Button acceptButton;
     @FXML
     private Button rejectButton;
+    @FXML
+    private Button logoutButton;
     @FXML
     private ListView<Notification> notificationList;
 
@@ -233,6 +240,21 @@ public class MainController implements Observer {
 
         acceptButton.setVisible(false);
         rejectButton.setVisible(false);
+    }
+
+    public void handleLogoutButton(MouseEvent mouseEvent) throws IOException {
+        LoginController.loggedUser = null;
+        Stage mainStage = (Stage) logoutButton.getScene().getWindow();
+        mainStage.close();
+
+        FXMLLoader loader = new FXMLLoader();
+        loader.setLocation(getClass().getResource("/views/loginLayout.fxml"));
+        BorderPane root = loader.load();
+
+        Stage loginStage = new Stage();
+        loginStage.setScene(new Scene(root));
+        loginStage.setTitle("Login");
+        loginStage.show();
     }
 
     public void showAddButton(MouseEvent mouseEvent) {
