@@ -33,7 +33,6 @@ public class ServiceFriendshipTest {
         Repository<Tuple<Long, Long>, Friendship> friendshipRepositoryTest = new InMemoryRepository<>(friendshipValidatorTest);
         Repository<Long, User> userRepositoryTest = new InMemoryRepository<>(userValidatorTest);
         Repository<Long, Chat> chatRepositoryTest = new InMemoryRepository<>(chatValidatorTest);
-        Repository<Long, Notification> notificationRepositoryTest = new InMemoryRepository<>(notificationValidatorTest);
 
         User ghostUser = new User("", "", "", "", null, null);
         ghostUser.resetCount();
@@ -45,8 +44,7 @@ public class ServiceFriendshipTest {
         userRepositoryTest.save(new User("Test", "Test", "test@yahoo.com",
                 "TestTest999", LocalDate.of(2000, 1, 1), Gender.UNKNOWN));
 
-        friendshipServiceTest = new FriendshipService(friendshipRepositoryTest, userRepositoryTest,
-                chatRepositoryTest, notificationRepositoryTest);
+        friendshipServiceTest = new FriendshipService(friendshipRepositoryTest, userRepositoryTest, chatRepositoryTest);
 
         friendshipMapInvalid = new HashMap<String, String>() {{
             put("id1", "");

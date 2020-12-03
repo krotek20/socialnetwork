@@ -9,6 +9,8 @@ import socialnetwork.domain.validators.ValidationException;
 import socialnetwork.domain.validators.Validator;
 import socialnetwork.repository.Repository;
 import socialnetwork.repository.RepositoryException;
+import socialnetwork.ui.gui.MainGUI;
+import socialnetwork.ui.gui.controllers.LoginController;
 import socialnetwork.ui.tui.BaseTUI;
 
 import java.sql.ResultSet;
@@ -106,7 +108,7 @@ public class NotificationDBRepository
                 notification.getNotifiedUsers()
                         .keySet()
                         .stream()
-                        .filter(x -> x.getID().equals(BaseTUI.loggedUser.getID()))
+                        .filter(x -> x.getID().equals(LoginController.loggedUser.getID()))
                         .collect(Collectors.toList())
                         .get(0)
                         .getID()));

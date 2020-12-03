@@ -13,7 +13,6 @@ import socialnetwork.service.*;
 
 import socialnetwork.ui.UI;
 import socialnetwork.ui.gui.MainGUI;
-import socialnetwork.ui.tui.login.LoginTUI;
 
 public class Main {
     public static void main(String[] args) {
@@ -38,11 +37,11 @@ public class Main {
         UserService userService = new UserService(
                 userDBRepository, friendshipDBRepository);
         FriendshipService friendshipService = new FriendshipService(
-                friendshipDBRepository, userDBRepository, chatDBRepository, notificationDBRepository);
+                friendshipDBRepository, userDBRepository, chatDBRepository);
         ChatService chatService = new ChatService(
-                chatDBRepository, userDBRepository, notificationDBRepository);
+                chatDBRepository, userDBRepository);
         MessageService messageService = new MessageService(
-                messageDBRepository, chatDBRepository, notificationDBRepository);
+                messageDBRepository, chatDBRepository);
         NotificationService notificationService = new NotificationService(
                 notificationDBRepository);
 

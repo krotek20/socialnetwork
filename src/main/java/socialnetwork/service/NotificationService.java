@@ -1,7 +1,9 @@
 package socialnetwork.service;
 
+import socialnetwork.Utils.design.Observable;
 import socialnetwork.domain.entities.Notification;
 import socialnetwork.domain.entities.User;
+import socialnetwork.domain.enums.NotificationStatus;
 import socialnetwork.domain.enums.NotificationType;
 import socialnetwork.domain.validators.ValidationException;
 import socialnetwork.repository.Repository;
@@ -17,11 +19,11 @@ import java.util.stream.StreamSupport;
  * Notification service class
  * Main notification functionalities are implemented here
  */
-public class NotificationService {
-    private final Repository<Long, Notification> notificationRepository;
+public class NotificationService extends Observable {
+    private static Repository<Long, Notification> notificationRepository = null;
 
     public NotificationService(Repository<Long, Notification> notificationRepository) {
-        this.notificationRepository = notificationRepository;
+        NotificationService.notificationRepository = notificationRepository;
     }
 
     /**
@@ -38,8 +40,9 @@ public class NotificationService {
      * @throws RepositoryException if notification ID is null.
      * @throws ValidationException if notification is not valid.
      */
-    public Notification createNotification(Set<User> notifiedUsers, User from, String entityText, NotificationType type,
-                                           String notificationText, LocalDateTime timestamp)
+    public static Notification createNotification(Set<User> notifiedUsers, User from, String entityText,
+                                                  NotificationType type, String notificationText,
+                                                  LocalDateTime timestamp)
             throws RepositoryException, ValidationException {
         Notification notification = new Notification(
                 notifiedUsers, from, entityText, type, notificationText, timestamp);
@@ -56,9 +59,10 @@ public class NotificationService {
      */
     public List<Notification> readAllNotifications(User user) {
         return StreamSupport.stream(notificationRepository.findAll().spliterator(), false)
-                .filter(x -> x.getNotifiedUsers().keySet()
+                .filter(x -> x.getNotifiedUsers().entrySet()
                         .stream()
-                        .anyMatch(y -> y.getID().equals(user.getID())))
+                        .filter(value -> value.getValue().equals(NotificationStatus.UNSEEN))
+                        .anyMatch(y -> y.getKey().getID().equals(user.getID())))
                 .collect(Collectors.toList());
     }
 
@@ -68,7 +72,7 @@ public class NotificationService {
      * @param notification instance of notification.
      * @throws RepositoryException if the notification was not found.
      */
-    public void updateSeenNotification(Notification notification) throws RepositoryException {
+    public static void updateSeenNotification(Notification notification) throws RepositoryException {
         notificationRepository.update(notification);
     }
 }

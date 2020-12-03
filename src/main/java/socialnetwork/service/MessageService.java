@@ -17,14 +17,12 @@ import java.util.stream.StreamSupport;
  * Message service class
  * Main message functionalities are implemented here
  */
-public class MessageService extends NotificationService {
+public class MessageService {
     private final Repository<Long, Message> messageRepository;
     private final Repository<Long, Chat> chatRepository;
 
     public MessageService(Repository<Long, Message> messageRepository,
-                          Repository<Long, Chat> chatRepository,
-                          Repository<Long, Notification> notificationRepository) {
-        super(notificationRepository);
+                          Repository<Long, Chat> chatRepository) {
         this.messageRepository = messageRepository;
         this.chatRepository = chatRepository;
     }
@@ -58,7 +56,7 @@ public class MessageService extends NotificationService {
                 .collect(Collectors.toSet());
 
         LocalDateTime currentTime = LocalDateTime.now();
-        Notification notification = super.createNotification(users, from, String.format(
+        Notification notification = NotificationService.createNotification(users, from, String.format(
                 "[%s] %s %s: %s", currentTime.format(Constants.DATE_TIME_FORMATTER),
                 from.getFirstName(), from.getLastName(), messageText),
                 NotificationType.MESSAGE, "New message!", LocalDateTime.now());

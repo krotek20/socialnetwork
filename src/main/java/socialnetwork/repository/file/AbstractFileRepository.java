@@ -1,7 +1,7 @@
 package socialnetwork.repository.file;
 
-import socialnetwork.design.Observable;
-import socialnetwork.design.Observer;
+import socialnetwork.Utils.design.Observable;
+import socialnetwork.Utils.design.Observer;
 import socialnetwork.domain.Entity;
 import socialnetwork.domain.entities.User;
 import socialnetwork.domain.validators.Validator;

@@ -18,14 +18,12 @@ import java.util.stream.StreamSupport;
  * Chat service class
  * Main chat functionalities are implemented here.
  */
-public class ChatService extends NotificationService {
+public class ChatService {
     private final Repository<Long, Chat> chatRepository;
     private final Repository<Long, User> userRepository;
 
     public ChatService(Repository<Long, Chat> chatRepository,
-                       Repository<Long, User> userRepository,
-                       Repository<Long, Notification> notificationRepository) {
-        super(notificationRepository);
+                       Repository<Long, User> userRepository) {
         this.chatRepository = chatRepository;
         this.userRepository = userRepository;
     }
@@ -52,7 +50,7 @@ public class ChatService extends NotificationService {
             users.add(user);
         }
 
-        Notification notification = super.createNotification(
+        Notification notification = NotificationService.createNotification(
                 users, loggedUser, String.format("%s %s added you in a new chat",
                         loggedUser.getFirstName(), loggedUser.getLastName()),
                 NotificationType.CHAT, "New chat!", LocalDateTime.now());

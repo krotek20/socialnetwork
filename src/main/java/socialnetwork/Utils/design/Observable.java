@@ -1,7 +1,7 @@
-package socialnetwork.design;
+package socialnetwork.Utils.design;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * It can be subclassed to represent an object that the application wants to have observed.
@@ -9,14 +9,14 @@ import java.util.Set;
  * An observer may be any object that implements interface {@code Observer}.
  */
 public class Observable {
-    private final Set<Observer> observers;
+    private final List<Observer> observers;
     private boolean changed = false;
 
     /**
      * Construct an Observable with zero Observers
      */
     public Observable() {
-        this.observers = new HashSet<>();
+        this.observers = new ArrayList<>();
     }
 
     /**
@@ -51,10 +51,10 @@ public class Observable {
      * that this object has no longer changed.
      */
     public void notifyObservers() {
-        Set<Observer> localObservers;
+        List<Observer> localObservers;
         synchronized (this) {
             if (!this.changed) return;
-            localObservers = new HashSet<>(this.observers);
+            localObservers = new ArrayList<>(this.observers);
             clearChanged();
         }
         for (Observer observer : localObservers) {

@@ -1,4 +1,4 @@
-package socialnetwork.design;
+package socialnetwork.Utils.design;
 
 /**
  * A class can implement the {@code Observer} interface when it

@@ -1,9 +1,6 @@
 package socialnetwork.service;
 
-import socialnetwork.Utils.Events.ChangeEventType;
-import socialnetwork.Utils.Events.UsersChangeEvent;
-import socialnetwork.Utils.Observer.Observable;
-import socialnetwork.Utils.Observer.Observer;
+import socialnetwork.Utils.design.Observable;
 import socialnetwork.Utils.Parse;
 import socialnetwork.domain.entities.Friendship;
 import socialnetwork.domain.enums.Gender;
@@ -26,12 +23,9 @@ import java.util.stream.StreamSupport;
  * User service class
  * Main user functionalities are implemented here
  */
-public class UserService implements Observable<UsersChangeEvent> {
-    //TODO
+public class UserService extends Observable {
     private final Repository<Long, User> userRepository;
     private final Repository<Tuple<Long, Long>, Friendship> friendshipRepository;
-
-    private List<Observer<UsersChangeEvent>> observers = new ArrayList<>();
 
     public UserService(Repository<Long, User> userRepository,
                        Repository<Tuple<Long, Long>, Friendship> friendshipRepository) {
@@ -81,10 +75,13 @@ public class UserService implements Observable<UsersChangeEvent> {
                 gender
         );
         user.setCount(user.getID());
-        if(userRepository.save(user) == null){
-            notifyObservers(new UsersChangeEvent(ChangeEventType.ADD, user));
+        User returnedUser = userRepository.save(user);
+        if (returnedUser == null) {
+            setChanged();
+            notifyObservers();
+            return true;
         }
-        return userRepository.save(user) == null;
+        return false;
     }
 
     /**
@@ -261,20 +258,5 @@ public class UserService implements Observable<UsersChangeEvent> {
                         .stream()
                         .map(x -> convertToFriendshipDTO(x, userID))
                         .collect(Collectors.toList()));
-    }
-
-    @Override
-    public void addObserver(Observer<UsersChangeEvent> e) {
-        observers.add(e);
-    }
-
-    @Override
-    public void removeObserver(Observer<UsersChangeEvent> e) {
-        observers.remove(e);
-    }
-
-    @Override
-    public void notifyObservers(UsersChangeEvent t) {
-        observers.stream().forEach(x -> x.update(t));
     }
 }

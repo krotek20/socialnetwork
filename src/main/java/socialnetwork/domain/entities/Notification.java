@@ -6,7 +6,6 @@ import socialnetwork.domain.enums.NotificationType;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class Notification implements Entity<Long> {
     private static long count = 1;
@@ -134,19 +133,22 @@ public class Notification implements Entity<Long> {
         return users;
     }
 
+    /**
+     * Sets the status of a notification as seen for a single User.
+     *
+     * @param user user to be notified.
+     */
+    public void setUserNotificationStatus(User user) {
+        for (Map.Entry<User, NotificationStatus> entry : notifiedUsers.entrySet()) {
+            if (entry.getKey().equals(user)) {
+                entry.setValue(NotificationStatus.SEEN);
+            }
+        }
+    }
+
     @Override
     public String toString() {
-        StringJoiner joiner = new StringJoiner(";");
-        joiner.add(String.valueOf(id))
-                .add(from.getID().toString())
-                .add(notifiedUsers.keySet().stream()
-                        .map(User::getID)
-                        .collect(Collectors.toList())
-                        .toString())
-                .add(notificationText)
-                .add(type.toString())
-                .add(entityText);
-        return joiner.toString();
+        return notificationText;
     }
 
     @Override

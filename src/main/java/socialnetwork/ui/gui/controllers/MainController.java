@@ -7,14 +7,16 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
-import socialnetwork.Utils.Events.FriendshipChangeEvent;
-import socialnetwork.Utils.Events.UsersChangeEvent;
-import socialnetwork.Utils.Observer.Observer;
+import socialnetwork.Utils.Constants;
+import socialnetwork.Utils.design.Observable;
+import socialnetwork.Utils.design.Observer;
 import socialnetwork.domain.entities.Friendship;
+import socialnetwork.domain.entities.Notification;
 import socialnetwork.domain.entities.User;
 import socialnetwork.domain.enums.FriendshipStatus;
 import socialnetwork.repository.RepositoryException;
 import socialnetwork.service.FriendshipService;
+import socialnetwork.service.NotificationService;
 import socialnetwork.service.UserService;
 import socialnetwork.ui.gui.MainGUI;
 
@@ -24,154 +26,145 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-public class MainController implements Observer<UsersChangeEvent> {
-    UserService userService;
-    FriendshipService friendshipService;
-    ObservableList<User> usersModel = FXCollections.observableArrayList();
-    ObservableList<User> friendsModel = FXCollections.observableArrayList();
+public class MainController implements Observer {
+    private UserService userService;
+    private FriendshipService friendshipService;
+    private NotificationService notificationService;
 
-
-    @FXML
-    private Tab accountTab;
-
-    @FXML
-    private Tab notificationsTab;
+    private final ObservableList<User> usersModel = FXCollections.observableArrayList();
+    private final ObservableList<User> friendsModel = FXCollections.observableArrayList();
+    private final ObservableList<Notification> notificationsModel = FXCollections.observableArrayList();
 
     @FXML
-    private Tab chatsTab;
-
+    private TextField filterUsersTextField;
     @FXML
-    TextField filterUsersTextField;
-
+    private TextField filterFriendsTextField;
     @FXML
-    TextField filterFriendsTextField;
-
+    private TableView<User> usersTable;
     @FXML
-    TableView<User> usersTable;
-
+    private TableColumn<User, String> userTableColumnName;
     @FXML
-    TableColumn<User,String> tableColumnName;
-
+    private TableColumn<User, String> userTableColumnSurname;
     @FXML
-    TableColumn<User,String> tableColumnSurname;
-
+    private TableView<User> friendsTable;
     @FXML
-    TableView<User> friendsTable;
-
+    private TableColumn<User, String> friendsTableColumnName;
     @FXML
-    TableColumn<User,String> friendsTableColumnName;
-
-    @FXML
-    TableColumn<User,String> friendsTableColumnSurname;
-
+    private TableColumn<User, String> friendsTableColumnSurname;
     @FXML
     private Button addFriendButton;
+    @FXML
+    private Button deleteFriendButton;
+    @FXML
+    private Button acceptButton;
+    @FXML
+    private Button rejectButton;
+    @FXML
+    private ListView<Notification> notificationList;
 
-    @FXML Button deleteFriendButton;
-
-    public void setServices(){
+    public void setServices() {
         this.userService = MainGUI.getUserService();
         this.friendshipService = MainGUI.getFriendshipService();
-        userService.addObserver(this);
+        this.notificationService = MainGUI.getNotificationService();
+
+        userService.register(this);
+        friendshipService.register(this);
+        notificationService.register(this);
+
         initModel();
     }
 
     @FXML
-    public void initialize(){
+    public void initialize() {
+        acceptButton.setVisible(false);
+        rejectButton.setVisible(false);
         addFriendButton.setVisible(false);
         deleteFriendButton.setVisible(false);
-        tableColumnName.setCellValueFactory(new PropertyValueFactory<User, String>("lastName"));
-        tableColumnSurname.setCellValueFactory(new PropertyValueFactory<User, String>("firstName"));
+
+        userTableColumnName.setCellValueFactory(new PropertyValueFactory<>("lastName"));
+        userTableColumnSurname.setCellValueFactory(new PropertyValueFactory<>("firstName"));
+        friendsTableColumnName.setCellValueFactory(new PropertyValueFactory<>("lastName"));
+        friendsTableColumnSurname.setCellValueFactory(new PropertyValueFactory<>("firstName"));
+
         usersTable.setItems(usersModel);
-        friendsTableColumnName.setCellValueFactory(new PropertyValueFactory<User, String>("lastName"));
-        friendsTableColumnSurname.setCellValueFactory(new PropertyValueFactory<User, String>("firstName"));
         friendsTable.setItems(friendsModel);
+        notificationList.setItems(notificationsModel);
     }
 
     private void initModel() {
-
-        Iterable<User> users = userService.findAllUsers();
-        List<User> userList = StreamSupport.stream(users.spliterator(), false)
+        List<User> userList = StreamSupport
+                .stream(userService.findAllUsers().spliterator(), false)
                 .collect(Collectors.toList());
 
-
         List<Friendship> friendships = userService.findFriendships(LoginController.loggedUser.getID());
-        List<Friendship> accetpedFriendships = friendships
+        List<Friendship> acceptedFriendships = friendships
                 .stream()
                 .filter(x -> x.getStatus().equals(FriendshipStatus.APPROVED))
                 .collect(Collectors.toList());
-        List<User> friendList = accetpedFriendships
+
+        List<User> friendList = acceptedFriendships
                 .stream()
-                .map(x -> {
-                    if(x.getID().getLeft().equals(LoginController.loggedUser.getID()))
-                        return userService.findOneUser(x.getID().getRight().toString());
-                    else
-                        return userService.findOneUser(x.getID().getLeft().toString());
-                })
+                .map(x -> (x.getID().getLeft().equals(LoginController.loggedUser.getID()) ?
+                        userService.findOneUser(x.getID().getRight().toString()) :
+                        userService.findOneUser(x.getID().getLeft().toString())))
                 .collect(Collectors.toList());
 
         userList.removeIf(friendList::contains);
 
+        List<Notification> notificationList = notificationService.readAllNotifications(LoginController.loggedUser);
+
         usersModel.setAll(userList);
         friendsModel.setAll(friendList);
+        notificationsModel.setAll(notificationList);
     }
 
     @Override
-    public void update(UsersChangeEvent usersChangeEvent) {
+    public void update(Observable observable) {
         initModel();
     }
 
     public void handleAddFriend(MouseEvent mouseEvent) {
-
         User user = usersTable.getSelectionModel().getSelectedItem();
-
-        if(user == null){
-            AlertBox.showErrorMessage(null, "No selected user!");
-        }
-        else{
+        if (user == null) {
+            AlertBox.showErrorMessage(null, "No user selected!");
+        } else {
             String id1 = user.getID().toString();
             String id2 = LoginController.loggedUser.getID().toString();
-            Map<String,String> friendshipMap = new HashMap<String, String>();
-            friendshipMap.put("id1",id1);
-            friendshipMap.put("id2",id2);
+            Map<String, String> friendshipMap = new HashMap<>();
+            friendshipMap.put("id1", id1);
+            friendshipMap.put("id2", id2);
             try {
                 friendshipService.requestFriendship(friendshipMap);
-                AlertBox.showMessage(null, Alert.AlertType.CONFIRMATION, "Request sent!", "Your friend request has been sent.");
-            }
-            catch(RepositoryException e){
+                AlertBox.showMessage(null, Alert.AlertType.CONFIRMATION,
+                        "Request sent!", "Your friend request has been sent.");
+            } catch (RepositoryException e) {
                 AlertBox.showErrorMessage(null, e.getMessage());
             }
         }
-
         addFriendButton.setVisible(false);
     }
 
-
     public void filterUsers(KeyEvent keyEvent) {
         String filter = filterUsersTextField.getText();
-        Iterable<User> users = userService.findAllUsers();
-        List<User> userList = StreamSupport.stream(users.spliterator(), false)
+        List<User> userList = StreamSupport.stream(userService.findAllUsers().spliterator(), false)
                 .filter(x -> (x.getFirstName() + " " + x.getLastName()).toLowerCase().contains(filter.toLowerCase()))
                 .collect(Collectors.toList());
         userList.removeIf(friendsModel::contains);
         usersModel.setAll(userList);
     }
+
     public void filterFriends(KeyEvent keyEvent) {
         String filter = filterFriendsTextField.getText();
-
         List<Friendship> friendships = userService.findFriendships(LoginController.loggedUser.getID());
-        List<Friendship> accetpedFriendships = friendships
+        List<Friendship> acceptedFriendships = friendships
                 .stream()
                 .filter(x -> x.getStatus().equals(FriendshipStatus.APPROVED))
                 .collect(Collectors.toList());
-        List<User> friendList = accetpedFriendships
+        List<User> friendList = acceptedFriendships
                 .stream()
-                .map(x -> {
-                    if(x.getID().getLeft().equals(LoginController.loggedUser.getID()))
-                        return userService.findOneUser(x.getID().getRight().toString());
-                    else
-                        return userService.findOneUser(x.getID().getLeft().toString());
-                })
+                .map(x -> (x.getID().getLeft().equals(LoginController.loggedUser.getID()) ?
+                        userService.findOneUser(x.getID().getRight().toString()) :
+                        userService.findOneUser(x.getID().getLeft().toString())))
                 .filter(x -> (x.getFirstName() + " " + x.getLastName()).toLowerCase().contains(filter.toLowerCase()))
                 .collect(Collectors.toList());
         friendsModel.setAll(friendList);
@@ -179,30 +172,73 @@ public class MainController implements Observer<UsersChangeEvent> {
 
     public void handleRemoveFriendButton(MouseEvent mouseEvent) {
         User friend = friendsTable.getSelectionModel().getSelectedItem();
-
-        if(friend == null){
+        if (friend == null) {
             AlertBox.showErrorMessage(null, "No selected friend!");
-        }
-        else{
+        } else {
             String id2 = friend.getID().toString();
             String id1 = LoginController.loggedUser.getID().toString();
-            Map<String,String> friendshipMap = new HashMap<String, String>();
-            friendshipMap.put("id1",id1);
-            friendshipMap.put("id2",id2);
-            boolean rez = friendshipService.deleteFriendship(friendshipMap);
-            if(rez)
+
+            Map<String, String> friendshipMap = new HashMap<>();
+            friendshipMap.put("id1", id1);
+            friendshipMap.put("id2", id2);
+            if (friendshipService.deleteFriendship(friendshipMap)) {
                 AlertBox.showMessage(null, Alert.AlertType.CONFIRMATION, "Friend removed!",
-                        friend.getLastName() + " " + friend.getFirstName()+" has been removed from your friend list.");
-            else
-                AlertBox.showErrorMessage(null, "An error occured.");
+                        friend.getLastName() + " " + friend.getFirstName() +
+                                " has been removed from your friend list.");
+            } else {
+                AlertBox.showErrorMessage(null, "An error occurred.");
+            }
         }
         initModel();
         deleteFriendButton.setVisible(false);
     }
 
+    public void handleNotificationsClick(MouseEvent mouseEvent) {
+        acceptButton.setVisible(true);
+        rejectButton.setVisible(true);
+        Notification notification = notificationList.getSelectionModel().getSelectedItem();
+        if (mouseEvent.getClickCount() == 2) {
+            AlertBox.showMessage(null, Alert.AlertType.INFORMATION, notification.getType() + " " +
+                            notification.getTimestamp().format(Constants.DATE_TIME_FORMATTER),
+                    notification.getEntityText());
+        }
+    }
+
+    public void handleAcceptFriendRequest(MouseEvent mouseEvent) {
+        Notification notification = notificationList.getSelectionModel().getSelectedItem();
+
+        notification.setUserNotificationStatus(LoginController.loggedUser);
+        NotificationService.updateSeenNotification(notification);
+
+        Friendship friendship = friendshipService.readFriendshipByNotification(notification.getID());
+        friendshipService.acceptFriendship(friendship);
+
+        AlertBox.showMessage(null, Alert.AlertType.CONFIRMATION, "Friend request!", "Friend added!");
+
+        acceptButton.setVisible(false);
+        rejectButton.setVisible(false);
+    }
+
+    public void handleRejectFriendRequest(MouseEvent mouseEvent) {
+        Notification notification = notificationList.getSelectionModel().getSelectedItem();
+
+        notification.setUserNotificationStatus(LoginController.loggedUser);
+        NotificationService.updateSeenNotification(notification);
+
+        Friendship friendship = friendshipService.readFriendshipByNotification(notification.getID());
+        friendshipService.rejectFriendship(friendship);
+
+        AlertBox.showMessage(null, Alert.AlertType.CONFIRMATION,
+                "Friend request!", "Friendship rejected!");
+
+        acceptButton.setVisible(false);
+        rejectButton.setVisible(false);
+    }
+
     public void showAddButton(MouseEvent mouseEvent) {
         addFriendButton.setVisible(true);
     }
+
     public void showRemoveButton(MouseEvent mouseEvent) {
         deleteFriendButton.setVisible(true);
     }
