@@ -4,6 +4,9 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import socialnetwork.domain.entities.User;
 import socialnetwork.ui.gui.MainGUI;
@@ -64,5 +67,22 @@ public class LoginController {
 
         loginButton.setDisable(false);
         registerButton.setDisable(false);
+    }
+
+    public void handleRegisterButton(MouseEvent mouseEvent) throws IOException{
+        Stage loginStage = (Stage) loginButton.getScene().getWindow();
+        loginStage.close();
+
+        FXMLLoader loader = new FXMLLoader();
+        loader.setLocation(getClass().getResource("/views/registerLayout.fxml"));
+        BorderPane root = loader.load();
+
+        Stage registerStage = new Stage();
+        registerStage.setTitle("Register");
+
+
+        Scene registerScene = new Scene(root);
+        registerStage.setScene(registerScene);
+        registerStage.show();
     }
 }
