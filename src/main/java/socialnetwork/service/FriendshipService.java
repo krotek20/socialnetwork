@@ -159,6 +159,20 @@ public class FriendshipService extends Observable {
     }
 
     /**
+     * Find the friendship of the given user ids
+     *
+     * @param friendshipMap key-value pairs representing the friendship attributes
+     * @return found friendship ; null otherwise
+     * @throws ValidationException when id string is empty or contains an invalid number
+     * @throws ServiceException    when id is not a Long parsable value.
+     */
+    public Friendship findOneFriendship(Map<String, String> friendshipMap) throws ValidationException, ServiceException {
+        Long id1 = Parse.safeParseLong(friendshipMap.get("id1"));
+        Long id2 = Parse.safeParseLong(friendshipMap.get("id2"));
+        return friendshipRepository.findOne(new Tuple<>(id1, id2));
+    }
+
+    /**
      * Read all friendships
      *
      * @return a string list of all friendships

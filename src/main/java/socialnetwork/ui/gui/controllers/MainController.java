@@ -18,6 +18,7 @@ import socialnetwork.domain.entities.Friendship;
 import socialnetwork.domain.entities.Notification;
 import socialnetwork.domain.entities.User;
 import socialnetwork.domain.enums.FriendshipStatus;
+import socialnetwork.domain.validators.ValidationException;
 import socialnetwork.repository.RepositoryException;
 import socialnetwork.service.FriendshipService;
 import socialnetwork.service.NotificationService;
@@ -67,6 +68,12 @@ public class MainController implements Observer {
     @FXML
     private Button logoutButton;
     @FXML
+    private Button cancelRequestButton;
+    @FXML
+    private Button openFriendChatButton;
+    @FXML
+    private Button openChatButton;
+    @FXML
     private ListView<Notification> notificationList;
 
     public void setServices() {
@@ -87,6 +94,9 @@ public class MainController implements Observer {
         rejectButton.setVisible(false);
         addFriendButton.setVisible(false);
         deleteFriendButton.setVisible(false);
+        openChatButton.setVisible(false);
+        openFriendChatButton.setVisible(false);
+        cancelRequestButton.setVisible(false);
 
         userTableColumnName.setCellValueFactory(new PropertyValueFactory<>("lastName"));
         userTableColumnSurname.setCellValueFactory(new PropertyValueFactory<>("firstName"));
@@ -144,11 +154,12 @@ public class MainController implements Observer {
                 friendshipService.requestFriendship(friendshipMap);
                 AlertBox.showMessage(null, Alert.AlertType.CONFIRMATION,
                         "Request sent!", "Your friend request has been sent.");
-            } catch (RepositoryException e) {
+            } catch (RepositoryException | ValidationException e) {
                 AlertBox.showErrorMessage(null, e.getMessage());
             }
         }
         addFriendButton.setVisible(false);
+        cancelRequestButton.setVisible(true);
     }
 
     public void filterUsers(KeyEvent keyEvent) {
@@ -198,6 +209,7 @@ public class MainController implements Observer {
         }
         initModel();
         deleteFriendButton.setVisible(false);
+        openFriendChatButton.setVisible(false);
     }
 
     public void handleNotificationsClick(MouseEvent mouseEvent) {
@@ -257,11 +269,49 @@ public class MainController implements Observer {
         loginStage.show();
     }
 
-    public void showAddButton(MouseEvent mouseEvent) {
-        addFriendButton.setVisible(true);
+    public void showUsersButtons(MouseEvent mouseEvent) {
+        addFriendButton.setVisible(false);
+        cancelRequestButton.setVisible(false);
+        openChatButton.setVisible(true);
+        User user = usersTable.getSelectionModel().getSelectedItem();
+        if (user == null) {
+            AlertBox.showErrorMessage(null, "No user selected!");
+        } else {
+            String id1 = user.getID().toString();
+            String id2 = LoginController.loggedUser.getID().toString();
+            Map<String, String> friendshipMap = new HashMap<>();
+            friendshipMap.put("id1", id1);
+            friendshipMap.put("id2", id2);
+            Friendship friendship = friendshipService.findOneFriendship(friendshipMap);
+            if (friendship == null)
+                addFriendButton.setVisible(true);
+            else if (friendship.getStatus() == FriendshipStatus.PENDING) {
+                cancelRequestButton.setVisible(true);
+            }
+        }
+
     }
 
-    public void showRemoveButton(MouseEvent mouseEvent) {
+    public void showFriendlistButtons(MouseEvent mouseEvent) {
         deleteFriendButton.setVisible(true);
+        openFriendChatButton.setVisible(true);
+    }
+
+    public void handleCancelRequest(MouseEvent mouseEvent) {
+        User user = usersTable.getSelectionModel().getSelectedItem();
+        String id1 = user.getID().toString();
+        String id2 = LoginController.loggedUser.getID().toString();
+        Map<String, String> friendshipMap = new HashMap<>();
+        friendshipMap.put("id1", id1);
+        friendshipMap.put("id2", id2);
+        try {
+            friendshipService.deleteFriendship(friendshipMap);
+            AlertBox.showMessage(null, Alert.AlertType.CONFIRMATION, "Request cancelled",
+                    "Friend request has been cancelled.");
+        } catch (RepositoryException e) {
+            AlertBox.showErrorMessage(null, e.getMessage());
+        }
+        cancelRequestButton.setVisible(false);
+        addFriendButton.setVisible(true);
     }
 }
