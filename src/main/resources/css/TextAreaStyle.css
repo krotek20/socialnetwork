@@ -1,0 +1,10 @@
+.text-area {
+    -fx-font-family: Calibri;
+    -fx-font-size: 16;
+    -fx-text-fill: #2b2b2b;
+    -fx-display-caret: true;
+}
+
+.text-area .content {
+    -fx-background-color: #f0ebeb;
+}

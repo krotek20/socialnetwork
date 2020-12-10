@@ -75,4 +75,14 @@ public class NotificationService extends Observable {
     public static void updateSeenNotification(Notification notification) throws RepositoryException {
         notificationRepository.update(notification);
     }
+
+    /**
+     * Deletes a notification by its ID.
+     *
+     * @param notificationID the ID of the current notification.
+     * @throws RepositoryException if there is no notification with the specified ID.
+     */
+    public static void deleteNotification(long notificationID) throws RepositoryException {
+        notificationRepository.delete(notificationID);
+    }
 }

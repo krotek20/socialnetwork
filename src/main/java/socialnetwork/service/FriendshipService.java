@@ -2,6 +2,7 @@ package socialnetwork.service;
 
 import socialnetwork.Utils.Graph;
 import socialnetwork.Utils.Parse;
+import socialnetwork.Utils.design.NotifyStatus;
 import socialnetwork.Utils.design.Observable;
 import socialnetwork.domain.*;
 import socialnetwork.domain.entities.Chat;
@@ -100,7 +101,7 @@ public class FriendshipService extends Observable {
 
         friendshipRepository.update(friendship);
         setChanged();
-        notifyObservers();
+        notifyObservers(NotifyStatus.FRIEND_REQUEST);
     }
 
     /**
@@ -115,7 +116,7 @@ public class FriendshipService extends Observable {
         friendship.setStatus(FriendshipStatus.REJECTED);
         friendshipRepository.update(friendship);
         setChanged();
-        notifyObservers();
+        notifyObservers(NotifyStatus.FRIEND_REQUEST);
     }
 
     /**
@@ -140,7 +141,12 @@ public class FriendshipService extends Observable {
                 NotificationType.FRIENDSHIP, "New friend request!", LocalDateTime.now());
         Friendship friendship = new Friendship(newFriends.getLeft().getID(),
                 newFriends.getRight().getID(), notification.getID());
-        return friendshipRepository.save(friendship) == null;
+        if (friendshipRepository.save(friendship) == null) {
+            setChanged();
+            notifyObservers(NotifyStatus.FRIEND_REQUEST);
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -213,10 +219,11 @@ public class FriendshipService extends Observable {
         long id1 = Parse.safeParseLong(friendshipMap.get("id1"));
         long id2 = Parse.safeParseLong(friendshipMap.get("id2"));
         Friendship friendship = friendshipRepository.findOne(new Tuple<>(id1, id2));
+        NotificationService.deleteNotification(friendship.getNotificationID());
         boolean status = friendshipRepository.delete(new Tuple<>(id1, id2)) != null;
         if (status) {
             setChanged();
-            notifyObservers();
+            notifyObservers(NotifyStatus.FRIEND_REQUEST);
         }
         return status;
     }

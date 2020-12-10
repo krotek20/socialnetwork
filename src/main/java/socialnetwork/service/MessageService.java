@@ -2,6 +2,8 @@ package socialnetwork.service;
 
 import socialnetwork.Utils.Constants;
 import socialnetwork.Utils.Parse;
+import socialnetwork.Utils.design.NotifyStatus;
+import socialnetwork.Utils.design.Observable;
 import socialnetwork.domain.entities.*;
 import socialnetwork.domain.enums.NotificationType;
 import socialnetwork.domain.validators.ValidationException;
@@ -17,7 +19,7 @@ import java.util.stream.StreamSupport;
  * Message service class
  * Main message functionalities are implemented here
  */
-public class MessageService {
+public class MessageService extends Observable {
     private final Repository<Long, Message> messageRepository;
     private final Repository<Long, Chat> chatRepository;
 
@@ -61,9 +63,13 @@ public class MessageService {
                 from.getFirstName(), from.getLastName(), messageText),
                 NotificationType.MESSAGE, "New message!", LocalDateTime.now());
 
-        Message message = new Message(from, to, messageText.trim(), replyText.trim(), notification.getID());
-        messageRepository.save(message);
-        return message;
+        Message message = new Message(from, to, messageText.trim(), replyText, notification.getID());
+        if (messageRepository.save(message) == null) {
+            setChanged();
+            notifyObservers(NotifyStatus.MESSAGE);
+            return message;
+        }
+        return null;
     }
 
     /**
@@ -84,16 +90,12 @@ public class MessageService {
         if (to.getUsers().stream().noneMatch(y -> y.getID().equals(from.getID()))) {
             throw new ServiceException("Access denied!");
         }
-        List<String> list = StreamSupport
+        return StreamSupport
                 .stream(messageRepository.findAll().spliterator(), false)
                 .filter(x -> x.getChat().equals(to))
                 .sorted(Comparator.comparing(Message::getTimestamp))
-                .map(x -> String.format("[%s] %s %s: %s",
-                        x.getTimestamp().format(Constants.DATE_TIME_FORMATTER), x.getFrom().getFirstName(),
-                        x.getFrom().getLastName(), x.getMessageText()))
+                .map(Message::toString)
                 .collect(Collectors.toList());
-        return list.size() != 0 ? list :
-                new ArrayList<>(Collections.singletonList("The list of messages is empty"));
     }
 
     /**

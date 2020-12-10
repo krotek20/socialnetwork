@@ -1,0 +1,10 @@
+.label {
+    -fx-text-fill: #583de2;
+    -fx-underline: TRUE;
+    -fx-font-size: 14.0;
+}
+
+.label:hover {
+    -fx-text-fill: BLUE;
+    -fx-cursor: HAND;
+}

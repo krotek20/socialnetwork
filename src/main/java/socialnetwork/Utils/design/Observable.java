@@ -50,7 +50,7 @@ public class Observable {
      * and then call the {@code clearChanged} method to indicate
      * that this object has no longer changed.
      */
-    public void notifyObservers() {
+    public void notifyObservers(NotifyStatus status) {
         List<Observer> localObservers;
         synchronized (this) {
             if (!this.changed) return;
@@ -58,7 +58,7 @@ public class Observable {
             clearChanged();
         }
         for (Observer observer : localObservers) {
-            observer.update(this);
+            observer.update(status);
         }
     }
 

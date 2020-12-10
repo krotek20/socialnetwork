@@ -1,5 +1,6 @@
 package socialnetwork.repository.file;
 
+import socialnetwork.Utils.design.NotifyStatus;
 import socialnetwork.Utils.design.Observable;
 import socialnetwork.Utils.design.Observer;
 import socialnetwork.domain.Entity;
@@ -105,11 +106,11 @@ public abstract class AbstractFileRepository<ID, E extends Entity<ID>>
     /**
      * Whenever this observable is observe, writeToFile will be called
      *
-     * @param observable the observable subject
+     * @param status the observable subject
      */
     @Override
-    public void update(Observable observable) {
-        if (observable == this) {
+    public void update(NotifyStatus status) {
+        if (status == NotifyStatus.CREATE_USER) {
             writeToFile();
         }
     }

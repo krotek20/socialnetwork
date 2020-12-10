@@ -1,0 +1,21 @@
+.list-cell {
+    -fx-cell-size: 50;
+    -fx-animated: true;
+    -fx-padding: 1px;
+}
+
+.list-cell:selected {
+    -fx-background-color: #ea5800;
+}
+
+.list-cell:hover {
+    -fx-background-color: #efa477;
+}
+
+.list-cell {
+    -fx-background-color: #f0ebeb;
+}
+
+.list-view {
+    -fx-background-color: #f0ebeb;
+}

@@ -9,7 +9,7 @@ public interface Observer {
      * Method to update the observer,
      * used by {@code Observable} (notifying actions)
      *
-     * @param observable the observable object
+     * @param status the current update status.
      */
-    void update(Observable observable);
+    void update(NotifyStatus status);
 }

@@ -5,32 +5,39 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="554.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="socialnetwork.ui.gui.controllers.LoginController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0"
+            prefWidth="554.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="socialnetwork.ui.gui.controllers.LoginController">
     <left>
         <AnchorPane prefHeight="400.0" prefWidth="245.0" BorderPane.alignment="CENTER">
             <children>
                 <ImageView fitHeight="407.0" fitWidth="263.0" layoutY="-5.0" pickOnBounds="true" preserveRatio="true">
                     <image>
-                        <Image url="@../images/loginbanner.png" />
+                        <Image url="@../images/loginbanner.png"/>
                     </image>
                 </ImageView>
             </children>
         </AnchorPane>
     </left>
     <center>
-        <AnchorPane prefHeight="395.0" prefWidth="277.0" style="-fx-background-color: #d5d5d5;" BorderPane.alignment="CENTER">
+        <AnchorPane prefHeight="395.0" prefWidth="277.0" style="-fx-background-color: #d5d5d5;"
+                    BorderPane.alignment="CENTER">
             <children>
-                <TextField fx:id="emailLoginText" layoutX="77.0" layoutY="118.0" promptText="Email" style="-fx-background-color: transparent; -fx-border-color: #ea5800; -fx-border-width: 0px 0px 0px 1px;" />
-                <PasswordField fx:id="passwordLoginText" layoutX="77.0" layoutY="160.0" promptText="Password" style="-fx-background-color: transparent; -fx-border-color: #ea5800; -fx-border-width: 0px 0px 0px 1px;" />
-                <Button fx:id="loginButton" layoutX="114.0" layoutY="223.0" mnemonicParsing="false" onAction="#handleLoginButton" prefHeight="25.0" prefWidth="74.0" style="-fx-background-color: #ea5800;" text="Login" textAlignment="CENTER" textFill="WHITE">
-                    <font>
-                        <Font name="Calibri" size="12.0" />
-                    </font>
+                <TextField fx:id="emailLoginText" layoutX="77.0" layoutY="118.0" promptText="Email"
+                           stylesheets="@../css/TextFieldStyle.css"/>
+                <PasswordField fx:id="passwordLoginText" layoutX="77.0" layoutY="160.0" promptText="Password"
+                               stylesheets="@../css/TextFieldStyle.css"/>
+                <Button id="filledButton" fx:id="loginButton" layoutX="114.0" layoutY="223.0" mnemonicParsing="false"
+                        onAction="#handleLoginButton" prefHeight="25.0" prefWidth="74.0"
+                        stylesheets="@../css/ButtonStyle.css" text="Login">
                 </Button>
-                <Button fx:id="registerButton" layoutX="114.0" layoutY="260.0" mnemonicParsing="false" onMouseClicked="#handleRegisterButton" prefHeight="27.0" prefWidth="74.0" style="-fx-background-color: transparent; -fx-border-color: #ea5800;" text="Register" />
-                <Label fx:id="loginFailedLabel" alignment="CENTER" layoutX="32.0" layoutY="191.0" prefHeight="18.0" prefWidth="242.0" textAlignment="CENTER" textFill="#f21414">
+                <Button id="borderedButton" fx:id="registerButton" layoutX="114.0" layoutY="260.0"
+                        mnemonicParsing="false" onMouseClicked="#handleRegisterButton" prefHeight="27.0"
+                        prefWidth="74.0" stylesheets="@../css/ButtonStyle.css" text="Register"/>
+                <Label fx:id="loginFailedLabel" alignment="CENTER" layoutX="32.0" layoutY="191.0" prefHeight="18.0"
+                       prefWidth="242.0" textAlignment="CENTER" textFill="#f21414">
                     <font>
-                        <Font size="10.0" />
+                        <Font size="10.0"/>
                     </font>
                 </Label>
             </children>

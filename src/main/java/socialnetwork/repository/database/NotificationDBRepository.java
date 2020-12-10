@@ -1,5 +1,6 @@
 package socialnetwork.repository.database;
 
+import socialnetwork.domain.entities.Friendship;
 import socialnetwork.domain.entities.Notification;
 import socialnetwork.domain.entities.User;
 import socialnetwork.domain.enums.NotificationStatus;
@@ -92,8 +93,13 @@ public class NotificationDBRepository
     }
 
     @Override
-    public Notification delete(Long aLong) throws RepositoryException {
-        return null;
+    public Notification delete(Long id) throws RepositoryException {
+        Notification notification = findOne(id);
+        if (notification == null) {
+            throw new RepositoryException("ID does not exist");
+        }
+        super.delete(id, String.format("delete from \"NOTIFICATIONS\" where \"ID_NOTIFICATION\" = %d", id));
+        return notification;
     }
 
     @Override

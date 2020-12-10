@@ -1,6 +1,7 @@
 package socialnetwork.ui.tui.menu;
 
 import socialnetwork.Utils.Constants;
+import socialnetwork.domain.entities.Chat;
 import socialnetwork.service.ChatService;
 import socialnetwork.service.MessageService;
 import socialnetwork.ui.tui.BaseTUI;
@@ -40,8 +41,8 @@ public class ChatTUI extends BaseTUI {
     }
 
     private void displayAllChats() {
-        for (String chat : chatService.readAllChats(loggedUser)) {
-            System.out.println(chat);
+        for (Chat chat : chatService.readAllChats(loggedUser)) {
+            System.out.println(chat.getID() + ". " + chat.getTitle());
         }
     }
 

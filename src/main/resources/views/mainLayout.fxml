@@ -5,55 +5,83 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<TabPane fx:id="tabPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" style="-fx-background-color: #d5d5d5;" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="socialnetwork.ui.gui.controllers.MainController">
+<TabPane fx:id="tabPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+         prefHeight="593.0" prefWidth="744.0" style="-fx-background-color: #4b4b4b;" tabClosingPolicy="UNAVAILABLE"
+         xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
+         fx:controller="socialnetwork.ui.gui.controllers.MainController">
     <tabs>
         <Tab fx:id="accountTab" text="Account">
             <content>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="312.0" prefWidth="553.0">
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="529.0" prefWidth="735.0">
                     <children>
-                        <Button fx:id="addFriendButton" layoutX="41.0" layoutY="462.0" mnemonicParsing="false" onMouseClicked="#handleAddFriend" prefHeight="25.0" prefWidth="96.0" style="-fx-background-color: #ea5800;" text="Add Friend" textAlignment="CENTER" textFill="WHITE">
-                            <font>
-                                <Font name="Calibri" size="12.0" />
-                            </font>
+                        <Button id="filledButton" fx:id="addFriendButton" layoutX="41.0" layoutY="462.0"
+                                mnemonicParsing="false" onMouseClicked="#handleAddFriend" prefHeight="26.0"
+                                prefWidth="97.0" stylesheets="@../css/ButtonStyle.css" text="Add Friend">
                         </Button>
-                        <TableView fx:id="usersTable" layoutX="41.0" layoutY="183.0" onMouseClicked="#showUsersButtons" prefHeight="251.0" prefWidth="193.0" style="-fx-border-color: #ea5800;">
+                        <TableView fx:id="usersTable" layoutX="41.0" layoutY="183.0" onMouseClicked="#showUsersButtons"
+                                   prefHeight="251.0" prefWidth="215.0"
+                                   style="-fx-border-color: #ea5800; -fx-background-color: #f0ebeb;">
                             <columns>
-                                <TableColumn fx:id="userTableColumnName" prefWidth="91.0" text="Last name" />
-                                <TableColumn fx:id="userTableColumnSurname" prefWidth="100.0" text="First name" />
+                                <TableColumn fx:id="userTableColumnName" prefWidth="91.0" text="Last name"/>
+                                <TableColumn fx:id="userTableColumnSurname" prefWidth="100.0" text="First name"/>
                             </columns>
                         </TableView>
-                        <TextField fx:id="filterFriendsTextField" layoutX="523.0" layoutY="89.0" onKeyTyped="#filterFriends" promptText="friends filter" style="-fx-border-color: #ea5800;" />
-                        <TableView fx:id="friendsTable" layoutX="502.0" layoutY="183.0" onMouseClicked="#showFriendlistButtons" prefHeight="251.0" prefWidth="193.0" style="-fx-border-color: #ea5800;">
-                            <columns>
-                                <TableColumn fx:id="friendsTableColumnName" prefWidth="93.0" text="Last name" />
-                                <TableColumn fx:id="friendsTableColumnSurname" prefWidth="98.0" text="First name" />
-                            </columns>
-                        </TableView>
-                        <Button fx:id="deleteFriendButton" layoutX="502.0" layoutY="462.0" mnemonicParsing="false" onMouseClicked="#handleRemoveFriendButton" style="-fx-background-color: #ea5800;" text="Remove Friend" textAlignment="CENTER" textFill="WHITE" />
-                        <TextField fx:id="filterUsersTextField" layoutX="66.0" layoutY="90.0" onKeyTyped="#filterUsers" promptText="users filter" style="-fx-border-color: #ea5800;">
+                        <TextField id="whiteTextField" fx:id="filterFriendsTextField" layoutX="523.0" layoutY="89.0"
+                                   onKeyTyped="#filterFriends" promptText="friends filter"
+                                   stylesheets="@../css/TextFieldStyle.css">
                             <font>
-                                <Font name="Calibri" size="12.0" />
+                                <Font name="Calibri" size="12.0"/>
                             </font>
                         </TextField>
-                        <Label alignment="CENTER" contentDisplay="CENTER" layoutX="102.0" layoutY="130.0" prefHeight="32.0" prefWidth="72.0" text="USERS" textAlignment="CENTER" textOverrun="CLIP">
+                        <TableView fx:id="friendsTable" layoutX="484.0" layoutY="183.0"
+                                   onMouseClicked="#showFriendlistButtons" prefHeight="251.0" prefWidth="215.0"
+                                   style="-fx-border-color: #ea5800; -fx-background-color: #f0ebeb;">
+                            <columns>
+                                <TableColumn fx:id="friendsTableColumnName" prefWidth="93.0" text="Last name"/>
+                                <TableColumn fx:id="friendsTableColumnSurname" prefWidth="98.0" text="First name"/>
+                            </columns>
+                        </TableView>
+                        <Button id="filledButton" fx:id="deleteFriendButton" layoutX="484.0" layoutY="462.0"
+                                mnemonicParsing="false" onMouseClicked="#handleRemoveFriendButton" prefHeight="26.0"
+                                prefWidth="97.0" stylesheets="@../css/ButtonStyle.css" text="Remove Friend"/>
+                        <TextField id="whiteTextField" fx:id="filterUsersTextField" layoutX="66.0" layoutY="90.0"
+                                   onKeyTyped="#filterUsers" promptText="users filter"
+                                   stylesheets="@../css/TextFieldStyle.css">
                             <font>
-                                <Font name="Arial Bold" size="15.0" />
+                                <Font name="Calibri" size="12.0"/>
+                            </font>
+                        </TextField>
+                        <Label alignment="CENTER" contentDisplay="CENTER" layoutX="102.0" layoutY="130.0"
+                               prefHeight="32.0" prefWidth="72.0" text="USERS" textAlignment="CENTER" textFill="#f0ebeb"
+                               textOverrun="CLIP">
+                            <font>
+                                <Font name="Arial Bold" size="15.0"/>
                             </font>
                         </Label>
-                        <Label alignment="CENTER" layoutX="554.0" layoutY="138.0" text="FRIENDLIST">
+                        <Label alignment="CENTER" layoutX="554.0" layoutY="138.0" text="FRIENDLIST" textFill="#f0ebeb">
                             <font>
-                                <Font name="Arial Bold" size="15.0" />
+                                <Font name="Arial Bold" size="15.0"/>
                             </font>
                         </Label>
-                        <Button fx:id="logoutButton" layoutX="365.0" layoutY="488.0" mnemonicParsing="false" onMouseClicked="#handleLogoutButton" prefHeight="31.0" prefWidth="33.0" style="-fx-background-color: transparent; -fx-border-color: ea5800;" />
-                  <Button fx:id="openChatButton" layoutX="149.0" layoutY="462.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="85.0" style="-fx-background-color: #ea5800;" text="Open Chat" textFill="WHITE" />
-                          <ImageView fitHeight="16.0" fitWidth="19.0" layoutX="373.0" layoutY="495.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                  <Image url="@../images/logout.png" />
-                              </image>
-                          </ImageView>
-                  <Button fx:id="cancelRequestButton" layoutX="40.0" layoutY="462.0" mnemonicParsing="false" onMouseClicked="#handleCancelRequest" prefHeight="19.0" prefWidth="98.0" style="-fx-background-color: #ea5800;" text="Cancel Request" textFill="WHITE" />
-                  <Button fx:id="openFriendChatButton" layoutX="610.0" layoutY="462.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="85.0" style="-fx-background-color: #ea5800;" text="Open Chat" textFill="WHITE" />
+                        <Button id="borderedButton" fx:id="logoutButton" layoutX="365.0" layoutY="488.0"
+                                mnemonicParsing="false" onMouseClicked="#handleLogoutButton" prefHeight="31.0"
+                                prefWidth="33.0" stylesheets="@../css/ButtonStyle.css"/>
+                        <Button id="filledButton" fx:id="openChatButton" layoutX="159.0" layoutY="462.0"
+                                mnemonicParsing="false" prefHeight="26.0" prefWidth="97.0"
+                                stylesheets="@../css/ButtonStyle.css" text="Open Chat"/>
+                        <ImageView fitHeight="16.0" fitWidth="19.0" layoutX="373.0" layoutY="495.0" pickOnBounds="true"
+                                   preserveRatio="true">
+                            <image>
+                                <Image url="@../images/logout.png"/>
+                            </image>
+                        </ImageView>
+                        <Button id="filledButton" fx:id="cancelRequestButton" layoutX="41.0" layoutY="462.0"
+                                mnemonicParsing="false" onMouseClicked="#handleCancelRequest" prefHeight="26.0"
+                                prefWidth="97.0" stylesheets="@../css/ButtonStyle.css" text="Cancel Request"/>
+                        <Button id="filledButton" fx:id="openFriendChatButton" layoutX="601.0" layoutY="462.0"
+                                onMouseClicked="#handleOpenChat" mnemonicParsing="false" prefHeight="26.0"
+                                prefWidth="97.0"
+                                stylesheets="@../css/ButtonStyle.css" text="Open Chat"/>
                     </children>
                 </AnchorPane>
             </content>
@@ -62,21 +90,26 @@
             <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                     <children>
-                        <ListView fx:id="notificationList" onMouseClicked="#handleNotificationsClick" prefHeight="292.0" prefWidth="600.0" style="-fx-border-color: #ea5800;" />
-                        <Button fx:id="acceptButton" layoutX="141.0" layoutY="311.0" mnemonicParsing="false" onMouseClicked="#handleAcceptFriendRequest" prefHeight="34.0" prefWidth="29.0" style="-fx-border-color: #ea5800;">
+                        <ListView fx:id="notificationList" onMouseClicked="#handleNotificationsClick" prefHeight="289.0"
+                                  prefWidth="259.0" stylesheets="@../css/ListViewStyle.css"/>
+                        <Button id="borderedButton" fx:id="acceptButton" layoutX="33.0" layoutY="324.0"
+                                mnemonicParsing="false" onMouseClicked="#handleAcceptFriendRequest" prefHeight="34.0"
+                                prefWidth="29.0" stylesheets="@../css/ButtonStyle.css">
                             <graphic>
                                 <ImageView fitHeight="23.0" fitWidth="19.0" pickOnBounds="true" preserveRatio="true">
                                     <image>
-                                        <Image url="@../images/accept_icon.png" />
+                                        <Image url="@../images/accept_icon.png"/>
                                     </image>
                                 </ImageView>
                             </graphic>
                         </Button>
-                        <Button fx:id="rejectButton" layoutX="409.0" layoutY="311.0" mnemonicParsing="false" onMouseClicked="#handleRejectFriendRequest" style="-fx-border-color: #ea5800;">
+                        <Button id="borderedButton" fx:id="rejectButton" layoutX="189.0" layoutY="324.0"
+                                mnemonicParsing="false" onMouseClicked="#handleRejectFriendRequest"
+                                stylesheets="@../css/ButtonStyle.css">
                             <graphic>
                                 <ImageView fitHeight="29.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
                                     <image>
-                                        <Image url="@../images/reject_icon.png" />
+                                        <Image url="@../images/reject_icon.png"/>
                                     </image>
                                 </ImageView>
                             </graphic>
@@ -87,7 +120,39 @@
         </Tab>
         <Tab fx:id="chatsTab" text="Chats">
             <content>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                    <children>
+                        <ListView fx:id="chatList" layoutX="497.0" layoutY="48.0" onMouseClicked="#displayChatName"
+                                  prefHeight="507.0" prefWidth="240.0" stylesheets="@../css/ListViewStyle.css"/>
+                        <Label layoutX="571.0" layoutY="14.0" text="ACTIVE CHATS" textFill="#f0ebeb">
+                            <font>
+                                <Font name="Calibri" size="18.0"/>
+                            </font>
+                        </Label>
+                        <TextArea fx:id="messagesTextArea" editable="false" layoutX="10.0" layoutY="52.0"
+                                  prefHeight="469.0" prefWidth="480.0"
+                                  promptText="Start a new conversation in this chat!"
+                                  stylesheets="@../css/TextAreaStyle.css" wrapText="true">
+                            <font>
+                                <Font name="Calibri" size="14.0"/>
+                            </font>
+                        </TextArea>
+                        <TextField id="whiteTextField" fx:id="messageTextField" layoutX="10.0" layoutY="522.0"
+                                   prefHeight="31.0"
+                                   prefWidth="418.0" promptText="Insert text message"
+                                   stylesheets="@../css/TextFieldStyle.css"/>
+                        <Button id="filledButton" fx:id="sendMessageButton" layoutX="422.0" layoutY="525.0"
+                                mnemonicParsing="false" onMouseClicked="#handleSendMessage" prefHeight="28.0"
+                                prefWidth="68.0" stylesheets="@../css/ButtonStyle.css" text="Send"/>
+                        <Button fx:id="activeChat" disable="true" focusTraversable="false" layoutX="10.0" layoutY="9.0"
+                                mnemonicParsing="false" opacity="0.77" prefHeight="42.0" prefWidth="480.0"
+                                style="-fx-background-color: #dbd6d2;" textAlignment="CENTER" textFill="#4b4b4b">
+                            <font>
+                                <Font name="Corbel" size="18.0"/>
+                            </font>
+                        </Button>
+                    </children>
+                </AnchorPane>
             </content>
         </Tab>
     </tabs>
