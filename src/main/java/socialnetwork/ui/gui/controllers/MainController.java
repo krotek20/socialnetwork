@@ -2,6 +2,7 @@ package socialnetwork.ui.gui.controllers;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -22,6 +23,7 @@ import socialnetwork.service.*;
 import socialnetwork.ui.gui.MainGUI;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -327,8 +329,11 @@ public class MainController implements Observer {
         tabPane.getSelectionModel().select(chatsTab);
         List<Chat> chats = chatService.readAllChats(LoginController.loggedUser);
         for (Chat chat : chats) {
-            if (chat.getChatSize() == 2 && chat.getUsers().contains(friend)) {
+            List<User> users = new ArrayList<>(chat.getUsers());
+            if (chat.getChatSize() == 2 && (users.get(0).getID().equals(friend.getID())
+                    || users.get(1).getID().equals(friend.getID()))) {
                 chatList.getSelectionModel().select(chat);
+                displayChatName(null);
                 break;
             }
         }
