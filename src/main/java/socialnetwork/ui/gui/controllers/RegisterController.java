@@ -100,13 +100,12 @@ public class RegisterController {
         String gender = genderComboBox.getValue();
         try {
             String birthDate = birthDatePicker.getValue().toString();
-        }
-        catch (NullPointerException e){
+        } catch (NullPointerException e) {
             birthDateEmptyLabel.setText("This field is required.");
             birthDatePicker.setStyle("-fx-text-box-border: #FF0000; -fx-focus-color: #FF0000");
             errors += "error";
         }
-        if(errors.length() == 0) {
+        if (errors.length() == 0) {
             Map<String, String> registerMap = new HashMap<String, String>() {{
                 put("email", email);
                 put("password", password);
@@ -120,43 +119,39 @@ public class RegisterController {
                 AlertBox.showMessage(null, Alert.AlertType.CONFIRMATION, "Account Created!",
                         "Account successfully created! You can now login into the app.");
                 openLoginTab(null);
-            }
-            catch(ValidationException e){
+            } catch (ValidationException e) {
                 AlertBox.showErrorMessage(null, "Invalid data!");
             }
         }
     }
 
-    private void handleEmptyField(TextField textField, Label label){
+    private void handleEmptyField(TextField textField, Label label) {
         label.setText("This field is required.");
         textField.setStyle("-fx-text-box-border: #FF0000; -fx-focus-color: #FF0000");
     }
 
     public void lastNameInput(KeyEvent keyEvent) {
-        if(!firstNameText.getText().matches("^[A-Z][a-z]+([ -][A-Z][a-z]+)*$")){
+        if (!firstNameText.getText().matches("^[A-Z][a-z]+([ -][A-Z][a-z]+)*$")) {
             firstNameEmptyLabel.setText("Invalid name.");
-        }
-        else {
+        } else {
             lastNameEmptyLabel.setText("");
             lastNameText.setStyle("-fx-text-box-border: #000000; -fx-focus-color: #000000");
         }
     }
 
     public void firstNameInput(KeyEvent keyEvent) {
-        if(!firstNameText.getText().matches("^[A-Z][a-z]+([ -][A-Z][a-z]+)*$")){
+        if (!firstNameText.getText().matches("^[A-Z][a-z]+([ -][A-Z][a-z]+)*$")) {
             firstNameEmptyLabel.setText("Invalid name.");
-        }
-        else {
+        } else {
             firstNameEmptyLabel.setText("");
             firstNameText.setStyle("-fx-text-box-border: #000000; -fx-focus-color: #000000");
         }
     }
 
     public void emailInput(KeyEvent keyEvent) {
-        if(!emailText.getText().matches("^\\w{1,32}([.-]\\w+)*@\\w+([-]\\w+)*([.]\\w+)+$")){
+        if (!emailText.getText().matches("^\\w{1,32}([.-]\\w+)*@\\w+([-]\\w+)*([.]\\w+)+$")) {
             emailEmptyLabel.setText("Invalid email address.");
-        }
-        else{
+        } else {
             emailEmptyLabel.setText("");
             emailText.setStyle("-fx-text-box-border: #000000; -fx-focus-color: #000000");
         }
@@ -164,30 +159,28 @@ public class RegisterController {
     }
 
     public void passwordInput(KeyEvent keyEvent) {
-        if(!(passwordText.getText().matches("^.{8,}$") &&
+        if (!(passwordText.getText().matches("^.{8,}$") &&
                 passwordText.getText().matches("^.*[A-Z]+.*$") &&
                 passwordText.getText().matches("^.*[0-9]+.*$")
-        )){
+        )) {
             passwordEmptyLabel.setText("Invalid password.");
-        }
-        else{
+        } else {
             passwordEmptyLabel.setText("");
             passwordText.setStyle("-fx-text-box-border: #000000; -fx-focus-color: #000000");
         }
     }
 
     public void confirmInput(KeyEvent keyEvent) {
-        if(!passwordText.getText().equals(confirmPasswordText.getText())){
+        if (!passwordText.getText().equals(confirmPasswordText.getText())) {
             confirmEmptyLabel.setText("Passwords do not match.");
-        }
-        else{
+        } else {
             confirmEmptyLabel.setText("");
             confirmPasswordText.setStyle("-fx-text-box-border: #000000; -fx-focus-color: #000000");
         }
     }
 
     public void birthDateInput(ActionEvent actionEvent) {
-        if(!passwordText.getText().equals("")){
+        if (!passwordText.getText().equals("")) {
             birthDateEmptyLabel.setText("");
             birthDatePicker.setStyle("-fx-text-box-border: #000000; -fx-focus-color: #000000");
         }

@@ -1,5 +1,6 @@
 package socialnetwork.repository.memory;
 
+import socialnetwork.Utils.design.NotifyStatus;
 import socialnetwork.Utils.design.Observable;
 import socialnetwork.domain.Entity;
 import socialnetwork.domain.validators.ValidationException;
@@ -79,7 +80,7 @@ public class InMemoryRepository<ID, E extends Entity<ID>> extends Observable imp
         }
         entities.put(entity.getID(), entity);
         setChanged();
-        notifyObservers();
+        notifyObservers(NotifyStatus.CREATE_USER);
         return null;
     }
 
@@ -106,7 +107,7 @@ public class InMemoryRepository<ID, E extends Entity<ID>> extends Observable imp
             throw new RepositoryException("id does not exist");
         }
         setChanged();
-        notifyObservers();
+        notifyObservers(NotifyStatus.CREATE_USER);
         return result;
     }
 
@@ -123,7 +124,7 @@ public class InMemoryRepository<ID, E extends Entity<ID>> extends Observable imp
         if (entities.get(entity.getID()) != null) {
             entities.put(entity.getID(), entity);
             setChanged();
-            notifyObservers();
+            notifyObservers(NotifyStatus.CREATE_USER);
             return null;
         }
         return entity;

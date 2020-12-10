@@ -1,11 +1,11 @@
 package socialnetwork.domain.entities;
 
+import socialnetwork.Utils.Constants;
 import socialnetwork.domain.Entity;
+import socialnetwork.ui.gui.controllers.LoginController;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
-import java.util.StringJoiner;
-import java.util.stream.Collectors;
 
 public class Message implements Entity<Long> {
     private static long count = 1;
@@ -105,18 +105,15 @@ public class Message implements Entity<Long> {
 
     @Override
     public String toString() {
-        StringJoiner joiner = new StringJoiner(";");
-        joiner.add(from.getID().toString())
-                .add(to.getTitle())
-                .add(to.getUsers()
-                        .stream()
-                        .map(User::getID)
-                        .collect(Collectors.toList())
-                        .toString())
-                .add(timestamp.toString())
-                .add(messageText)
-                .add(reply);
-        return joiner.toString();
+        StringBuilder builder = new StringBuilder();
+        builder.append("[").append(timestamp.format(Constants.DATE_TIME_FORMATTER)).append("] ");
+        if (LoginController.loggedUser.getID().equals(from.getID())) {
+            builder.append("You: ");
+        } else {
+            builder.append(from.getFirstName()).append(" ").append(from.getLastName()).append(": ");
+        }
+        builder.append(messageText);
+        return builder.toString();
     }
 
     @Override

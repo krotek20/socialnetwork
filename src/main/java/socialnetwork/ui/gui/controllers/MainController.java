@@ -12,17 +12,13 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import socialnetwork.Utils.Constants;
-import socialnetwork.Utils.design.Observable;
+import socialnetwork.Utils.design.NotifyStatus;
 import socialnetwork.Utils.design.Observer;
-import socialnetwork.domain.entities.Friendship;
-import socialnetwork.domain.entities.Notification;
-import socialnetwork.domain.entities.User;
+import socialnetwork.domain.entities.*;
 import socialnetwork.domain.enums.FriendshipStatus;
 import socialnetwork.domain.validators.ValidationException;
 import socialnetwork.repository.RepositoryException;
-import socialnetwork.service.FriendshipService;
-import socialnetwork.service.NotificationService;
-import socialnetwork.service.UserService;
+import socialnetwork.service.*;
 import socialnetwork.ui.gui.MainGUI;
 
 import java.io.IOException;
@@ -34,17 +30,26 @@ import java.util.stream.StreamSupport;
 
 public class MainController implements Observer {
     private UserService userService;
+    private ChatService chatService;
+    private MessageService messageService;
     private FriendshipService friendshipService;
     private NotificationService notificationService;
 
     private final ObservableList<User> usersModel = FXCollections.observableArrayList();
+    private final ObservableList<Chat> chatsModel = FXCollections.observableArrayList();
     private final ObservableList<User> friendsModel = FXCollections.observableArrayList();
     private final ObservableList<Notification> notificationsModel = FXCollections.observableArrayList();
 
     @FXML
+    private TabPane tabPane;
+    @FXML
+    private Tab chatsTab;
+    @FXML
     private TextField filterUsersTextField;
     @FXML
     private TextField filterFriendsTextField;
+    @FXML
+    private TextField messageTextField;
     @FXML
     private TableView<User> usersTable;
     @FXML
@@ -74,14 +79,26 @@ public class MainController implements Observer {
     @FXML
     private Button openChatButton;
     @FXML
+    private Button activeChat;
+    @FXML
+    private Button sendMessageButton;
+    @FXML
     private ListView<Notification> notificationList;
+    @FXML
+    private ListView<Chat> chatList;
+    @FXML
+    private TextArea messagesTextArea;
 
     public void setServices() {
         this.userService = MainGUI.getUserService();
+        this.chatService = MainGUI.getChatService();
+        this.messageService = MainGUI.getMessageService();
         this.friendshipService = MainGUI.getFriendshipService();
         this.notificationService = MainGUI.getNotificationService();
 
         userService.register(this);
+        chatService.register(this);
+        messageService.register(this);
         friendshipService.register(this);
         notificationService.register(this);
 
@@ -97,30 +114,34 @@ public class MainController implements Observer {
         openChatButton.setVisible(false);
         openFriendChatButton.setVisible(false);
         cancelRequestButton.setVisible(false);
+        activeChat.setText("");
 
         userTableColumnName.setCellValueFactory(new PropertyValueFactory<>("lastName"));
         userTableColumnSurname.setCellValueFactory(new PropertyValueFactory<>("firstName"));
         friendsTableColumnName.setCellValueFactory(new PropertyValueFactory<>("lastName"));
         friendsTableColumnSurname.setCellValueFactory(new PropertyValueFactory<>("firstName"));
 
+        chatList.setItems(chatsModel);
         usersTable.setItems(usersModel);
         friendsTable.setItems(friendsModel);
         notificationList.setItems(notificationsModel);
     }
 
     private void initModel() {
+        initAccountTab();
+        initNotificationsModel();
+        initChatsModel();
+    }
+
+    private void initAccountTab() {
         List<User> userList = StreamSupport
                 .stream(userService.findAllUsers().spliterator(), false)
                 .collect(Collectors.toList());
 
         List<Friendship> friendships = userService.findFriendships(LoginController.loggedUser.getID());
-        List<Friendship> acceptedFriendships = friendships
+        List<User> friendList = friendships
                 .stream()
                 .filter(x -> x.getStatus().equals(FriendshipStatus.APPROVED))
-                .collect(Collectors.toList());
-
-        List<User> friendList = acceptedFriendships
-                .stream()
                 .map(x -> (x.getID().getLeft().equals(LoginController.loggedUser.getID()) ?
                         userService.findOneUser(x.getID().getRight().toString()) :
                         userService.findOneUser(x.getID().getLeft().toString())))
@@ -128,18 +149,47 @@ public class MainController implements Observer {
 
         userList.removeIf(friendList::contains);
 
-        List<Notification> notificationList = notificationService.readAllNotifications(LoginController.loggedUser);
-
         usersModel.setAll(userList);
         friendsModel.setAll(friendList);
+    }
+
+    private void initChatLog() {
+        Chat chat = chatList.getSelectionModel().getSelectedItem();
+        if (chat != null) {
+            List<String> messagesList = messageService.readAllMessages(
+                    LoginController.loggedUser, chat.getID().toString());
+            StringBuilder builder = new StringBuilder();
+            for (String message : messagesList) {
+                builder.append("\n").append(message);
+            }
+            messagesTextArea.setText(builder.toString());
+        }
+    }
+
+    private void initNotificationsModel() {
+        List<Notification> notificationList = notificationService.readAllNotifications(LoginController.loggedUser);
         notificationsModel.setAll(notificationList);
     }
 
-    @Override
-    public void update(Observable observable) {
-        initModel();
+    private void initChatsModel() {
+        List<Chat> chatsList = chatService.readAllChats(LoginController.loggedUser);
+        chatsModel.setAll(chatsList);
     }
 
+    @Override
+    public void update(NotifyStatus status) {
+        if (status == NotifyStatus.MESSAGE) {
+            initChatLog();
+        } else if (status == NotifyStatus.CHAT) {
+            initChatsModel();
+        } else if (status == NotifyStatus.FRIEND_REQUEST || status == NotifyStatus.CREATE_USER) {
+            initAccountTab();
+            initChatsModel();
+        }
+        initNotificationsModel();
+    }
+
+    // Account tab functionalities
     public void handleAddFriend(MouseEvent mouseEvent) {
         User user = usersTable.getSelectionModel().getSelectedItem();
         if (user == null) {
@@ -207,51 +257,8 @@ public class MainController implements Observer {
                 AlertBox.showErrorMessage(null, "An error occurred.");
             }
         }
-        initModel();
         deleteFriendButton.setVisible(false);
         openFriendChatButton.setVisible(false);
-    }
-
-    public void handleNotificationsClick(MouseEvent mouseEvent) {
-        acceptButton.setVisible(true);
-        rejectButton.setVisible(true);
-        Notification notification = notificationList.getSelectionModel().getSelectedItem();
-        if (mouseEvent.getClickCount() == 2) {
-            AlertBox.showMessage(null, Alert.AlertType.INFORMATION, notification.getType() + " " +
-                            notification.getTimestamp().format(Constants.DATE_TIME_FORMATTER),
-                    notification.getEntityText());
-        }
-    }
-
-    public void handleAcceptFriendRequest(MouseEvent mouseEvent) {
-        Notification notification = notificationList.getSelectionModel().getSelectedItem();
-
-        notification.setUserNotificationStatus(LoginController.loggedUser);
-        NotificationService.updateSeenNotification(notification);
-
-        Friendship friendship = friendshipService.readFriendshipByNotification(notification.getID());
-        friendshipService.acceptFriendship(friendship);
-
-        AlertBox.showMessage(null, Alert.AlertType.CONFIRMATION, "Friend request!", "Friend added!");
-
-        acceptButton.setVisible(false);
-        rejectButton.setVisible(false);
-    }
-
-    public void handleRejectFriendRequest(MouseEvent mouseEvent) {
-        Notification notification = notificationList.getSelectionModel().getSelectedItem();
-
-        notification.setUserNotificationStatus(LoginController.loggedUser);
-        NotificationService.updateSeenNotification(notification);
-
-        Friendship friendship = friendshipService.readFriendshipByNotification(notification.getID());
-        friendshipService.rejectFriendship(friendship);
-
-        AlertBox.showMessage(null, Alert.AlertType.CONFIRMATION,
-                "Friend request!", "Friendship rejected!");
-
-        acceptButton.setVisible(false);
-        rejectButton.setVisible(false);
     }
 
     public void handleLogoutButton(MouseEvent mouseEvent) throws IOException {
@@ -313,5 +320,81 @@ public class MainController implements Observer {
         }
         cancelRequestButton.setVisible(false);
         addFriendButton.setVisible(true);
+    }
+
+    public void handleOpenChat(MouseEvent mouseEvent) {
+        User friend = friendsTable.getSelectionModel().getSelectedItem();
+        tabPane.getSelectionModel().select(chatsTab);
+        List<Chat> chats = chatService.readAllChats(LoginController.loggedUser);
+        for (Chat chat : chats) {
+            if (chat.getChatSize() == 2 && chat.getUsers().contains(friend)) {
+                chatList.getSelectionModel().select(chat);
+                break;
+            }
+        }
+    }
+
+    // Notifications tab functionalities
+    public void handleNotificationsClick(MouseEvent mouseEvent) {
+        acceptButton.setVisible(true);
+        rejectButton.setVisible(true);
+        Notification notification = notificationList.getSelectionModel().getSelectedItem();
+        if (mouseEvent.getClickCount() == 2) {
+            AlertBox.showMessage(null, Alert.AlertType.INFORMATION, notification.getType() + " " +
+                            notification.getTimestamp().format(Constants.DATE_TIME_FORMATTER),
+                    notification.getEntityText());
+        }
+    }
+
+    public void handleAcceptFriendRequest(MouseEvent mouseEvent) {
+        Notification notification = notificationList.getSelectionModel().getSelectedItem();
+
+        notification.setUserNotificationStatus(LoginController.loggedUser);
+        NotificationService.updateSeenNotification(notification);
+
+        Friendship friendship = friendshipService.readFriendshipByNotification(notification.getID());
+        friendshipService.acceptFriendship(friendship);
+
+        AlertBox.showMessage(null, Alert.AlertType.CONFIRMATION, "Friend request!", "Friend added!");
+
+        acceptButton.setVisible(false);
+        rejectButton.setVisible(false);
+    }
+
+    public void handleRejectFriendRequest(MouseEvent mouseEvent) {
+        Notification notification = notificationList.getSelectionModel().getSelectedItem();
+
+        notification.setUserNotificationStatus(LoginController.loggedUser);
+        NotificationService.updateSeenNotification(notification);
+
+        Friendship friendship = friendshipService.readFriendshipByNotification(notification.getID());
+        friendshipService.rejectFriendship(friendship);
+
+        AlertBox.showMessage(null, Alert.AlertType.CONFIRMATION,
+                "Friend request!", "Friendship rejected!");
+
+        acceptButton.setVisible(false);
+        rejectButton.setVisible(false);
+    }
+
+    // Chats tab functionalities
+    public void displayChatName(MouseEvent mouseEvent) {
+        Chat selectedChat = chatList.getSelectionModel().getSelectedItem();
+        activeChat.setText(selectedChat.toString());
+        initChatLog();
+        chatList.getSelectionModel().select(selectedChat);
+    }
+
+    public void handleSendMessage(MouseEvent mouseEvent) {
+        Chat selectedChat = chatList.getSelectionModel().getSelectedItem();
+        if (!messageTextField.getText().trim().equals("")) {
+            messageService.sendMessage(LoginController.loggedUser, new HashMap<String, String>() {{
+                put("to", selectedChat.getID().toString());
+                put("message", messageTextField.getText());
+                put("reply", null);
+            }});
+            messageTextField.setText("");
+            chatList.getSelectionModel().select(selectedChat);
+        }
     }
 }

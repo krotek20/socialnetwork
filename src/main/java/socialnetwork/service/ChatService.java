@@ -1,6 +1,8 @@
 package socialnetwork.service;
 
 import socialnetwork.Utils.Parse;
+import socialnetwork.Utils.design.NotifyStatus;
+import socialnetwork.Utils.design.Observable;
 import socialnetwork.domain.entities.Chat;
 import socialnetwork.domain.entities.Notification;
 import socialnetwork.domain.entities.User;
@@ -18,7 +20,7 @@ import java.util.stream.StreamSupport;
  * Chat service class
  * Main chat functionalities are implemented here.
  */
-public class ChatService {
+public class ChatService extends Observable {
     private final Repository<Long, Chat> chatRepository;
     private final Repository<Long, User> userRepository;
 
@@ -59,24 +61,25 @@ public class ChatService {
         chat.setCount(chat.getID());
         users.add(loggedUser);
         chat.setUsers(users);
-        return chatRepository.save(chat) == null;
+        if (chatRepository.save(chat) == null) {
+            setChanged();
+            notifyObservers(NotifyStatus.CHAT);
+            return true;
+        }
+        return false;
     }
 
     /**
      * Reads all chats of the {@code loggedUser};
      *
      * @param loggedUser user instance currently logged user.
-     * @return list of required chats informational data
-     * or a list with a single string "The list of chats is empty"
-     * if the logged user doesn't have any chat.
+     * @return list of required chats informational data.
      */
-    public List<String> readAllChats(User loggedUser) {
-        List<String> list = StreamSupport.stream(chatRepository.findAll().spliterator(), false)
+    public List<Chat> readAllChats(User loggedUser) {
+        return StreamSupport.stream(chatRepository.findAll().spliterator(), false)
                 .filter(x -> x.getUsers()
                         .stream()
                         .anyMatch(y -> y.getID().equals(loggedUser.getID())))
-                .map(x -> String.format("%d. %s", x.getID(), x.getTitle()))
                 .collect(Collectors.toList());
-        return list.size() != 0 ? list : new ArrayList<>(Collections.singletonList("The list of chats is empty"));
     }
 }

@@ -1,6 +1,7 @@
 package socialnetwork.domain.entities;
 
 import socialnetwork.domain.Entity;
+import socialnetwork.ui.gui.controllers.LoginController;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -108,14 +109,14 @@ public class Chat implements Entity<Long> {
 
     @Override
     public String toString() {
-        StringJoiner joiner = new StringJoiner(";");
-        joiner.add(String.valueOf(id))
-                .add(title)
-                .add(users.stream()
-                        .map(User::getID)
-                        .collect(Collectors.toList())
-                        .toString());
-        return joiner.toString();
+        if (users.size() > 2) {
+            return title;
+        } else {
+            List<User> localUsers = new ArrayList<>(users);
+            User user = (LoginController.loggedUser.getID().equals(localUsers.get(0).getID())
+                    ? localUsers.get(1) : localUsers.get(0));
+            return user.getFirstName() + " " + user.getLastName();
+        }
     }
 
     @Override

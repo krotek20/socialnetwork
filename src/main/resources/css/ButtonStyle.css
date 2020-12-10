@@ -1,0 +1,22 @@
+.button {
+    -fx-opacity: 1.0;
+    -fx-text-alignment: CENTER;
+    -fx-font-family: Calibri;
+    -fx-font-size: 12.0;
+}
+
+#filledButton {
+    -fx-background-color: #ea5800;
+    -fx-text-fill: WHITE;
+}
+
+#borderedButton {
+    -fx-background-color: transparent;
+    -fx-border-color: #ea5800;
+    -fx-text-fill: #ea5800;
+}
+
+.button:hover {
+    -fx-opacity: 0.6;
+    -fx-cursor: HAND;
+}

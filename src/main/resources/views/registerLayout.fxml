@@ -4,61 +4,84 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="socialnetwork.ui.gui.controllers.RegisterController">
-   <center>
-      <AnchorPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-         <children>
-            <DatePicker fx:id="birthDatePicker" editable="false" layoutX="213.0" layoutY="293.0" onAction="#birthDateInput" promptText="Birth date" />
-            <TextField fx:id="lastNameText" layoutX="306.0" layoutY="67.0" onKeyTyped="#lastNameInput" prefHeight="25.0" prefWidth="132.0" promptText="Last name" />
-            <TextField fx:id="firstNameText" layoutX="173.0" layoutY="67.0" onKeyTyped="#firstNameInput" prefHeight="25.0" prefWidth="127.0" promptText="First name" />
-            <PasswordField fx:id="passwordText" layoutX="172.0" layoutY="167.0" onKeyTyped="#passwordInput" prefHeight="25.0" prefWidth="263.0" promptText="Password" />
-            <TextField fx:id="emailText" layoutX="171.0" layoutY="117.0" onKeyTyped="#emailInput" prefHeight="25.0" prefWidth="263.0" promptText="Email address" />
-            <ComboBox fx:id="genderComboBox" layoutX="222.0" layoutY="260.0" prefWidth="150.0" promptText="Gender" />
-            <PasswordField fx:id="confirmPasswordText" layoutX="173.0" layoutY="214.0" onKeyTyped="#confirmInput" prefHeight="25.0" prefWidth="263.0" promptText="Confim password" />
-            <Button fx:id="signUpButton" layoutX="263.0" layoutY="351.0" mnemonicParsing="false" onMouseClicked="#handleSignUpButton" prefHeight="29.0" prefWidth="69.0" style="-fx-background-color: #ea5800;" text="Sign up" textFill="WHITE" />
-            <Label layoutX="139.0" layoutY="14.0" text="SIGN UP TO GET STARTED!">
-               <font>
-                  <Font name="Arial Bold" size="24.0" />
-               </font></Label>
-            <Label fx:id="passwordEmptyLabel" layoutX="171.0" layoutY="192.0" text="This field is required." textFill="RED">
-               <font>
-                  <Font name="System Bold" size="12.0" />
-               </font>
-            </Label>
-            <Label fx:id="confirmEmptyLabel" layoutX="171.0" layoutY="239.0" text="This field is required." textFill="RED">
-               <font>
-                  <Font name="System Bold" size="12.0" />
-               </font></Label>
-            <Label fx:id="emailEmptyLabel" layoutX="171.0" layoutY="142.0" text="This field is required." textFill="RED">
-               <font>
-                  <Font name="System Bold" size="12.0" />
-               </font>
-            </Label>
-            <Label fx:id="firstNameEmptyLabel" layoutX="171.0" layoutY="92.0" text="This field is required." textFill="RED">
-               <font>
-                  <Font name="System Bold" size="12.0" />
-               </font>
-            </Label>
-            <Label fx:id="lastNameEmptyLabel" layoutX="306.0" layoutY="92.0" text="This field is required." textFill="RED">
-               <font>
-                  <Font name="System Bold" size="12.0" />
-               </font>
-            </Label>
-            <Label fx:id="birthDateEmptyLabel" layoutX="235.0" layoutY="318.0" text="This field is required." textFill="RED">
-               <font>
-                  <Font name="System Bold" size="12.0" />
-               </font>
-            </Label>
-            <Label layoutX="197.0" layoutY="42.0" text="Already registered?">
-               <font>
-                  <Font size="14.0" />
-               </font>
-            </Label>
-            <Label fx:id="signInLabel" layoutX="323.0" layoutY="42.0" onMouseClicked="#openLoginTab" text="Sign in" textFill="BLUE" underline="true">
-               <font>
-                  <Font size="14.0" />
-               </font>
-            </Label>
-         </children></AnchorPane>
-   </center>
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0"
+            prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="socialnetwork.ui.gui.controllers.RegisterController">
+    <center>
+        <AnchorPane prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: #4b4b4b;"
+                    BorderPane.alignment="CENTER">
+            <children>
+                <DatePicker fx:id="birthDatePicker" editable="false" layoutX="213.0" layoutY="293.0"
+                            onAction="#birthDateInput" promptText="Birth date"/>
+                <TextField id="whiteTextField" fx:id="lastNameText" layoutX="306.0" layoutY="67.0"
+                           onKeyTyped="#lastNameInput" prefHeight="25.0" prefWidth="132.0" promptText="Last name"
+                           stylesheets="@../css/TextFieldStyle.css"/>
+                <TextField id="whiteTextField" fx:id="firstNameText" layoutX="173.0" layoutY="67.0"
+                           onKeyTyped="#firstNameInput" prefHeight="25.0" prefWidth="127.0" promptText="First name"
+                           stylesheets="@../css/TextFieldStyle.css"/>
+                <PasswordField id="whiteTextField" fx:id="passwordText" layoutX="172.0" layoutY="167.0"
+                               onKeyTyped="#passwordInput" prefHeight="25.0" prefWidth="263.0" promptText="Password"
+                               stylesheets="@../css/TextFieldStyle.css"/>
+                <TextField id="whiteTextField" fx:id="emailText" layoutX="171.0" layoutY="117.0"
+                           onKeyTyped="#emailInput" prefHeight="25.0" prefWidth="263.0" promptText="Email address"
+                           stylesheets="@../css/TextFieldStyle.css"/>
+                <ComboBox fx:id="genderComboBox" layoutX="222.0" layoutY="260.0" prefWidth="150.0" promptText="Gender"/>
+                <PasswordField id="whiteTextField" fx:id="confirmPasswordText" layoutX="173.0" layoutY="214.0"
+                               onKeyTyped="#confirmInput" prefHeight="25.0" prefWidth="263.0"
+                               promptText="Confirm password" stylesheets="@../css/TextFieldStyle.css"/>
+                <Button id="filledButton" fx:id="signUpButton" layoutX="263.0" layoutY="351.0" mnemonicParsing="false"
+                        onMouseClicked="#handleSignUpButton" prefHeight="29.0" prefWidth="69.0"
+                        stylesheets="@../css/ButtonStyle.css" text="Sign up"/>
+                <Label layoutX="139.0" layoutY="14.0" text="SIGN UP TO GET STARTED!" textFill="#f0ebeb">
+                    <font>
+                        <Font name="Arial Bold" size="24.0"/>
+                    </font>
+                </Label>
+                <Label fx:id="passwordEmptyLabel" layoutX="171.0" layoutY="192.0" text="This field is required."
+                       textFill="RED">
+                    <font>
+                        <Font name="System Bold" size="12.0"/>
+                    </font>
+                </Label>
+                <Label fx:id="confirmEmptyLabel" layoutX="171.0" layoutY="239.0" text="This field is required."
+                       textFill="RED">
+                    <font>
+                        <Font name="System Bold" size="12.0"/>
+                    </font>
+                </Label>
+                <Label fx:id="emailEmptyLabel" layoutX="171.0" layoutY="142.0" text="This field is required."
+                       textFill="RED">
+                    <font>
+                        <Font name="System Bold" size="12.0"/>
+                    </font>
+                </Label>
+                <Label fx:id="firstNameEmptyLabel" layoutX="171.0" layoutY="92.0" text="This field is required."
+                       textFill="RED">
+                    <font>
+                        <Font name="System Bold" size="12.0"/>
+                    </font>
+                </Label>
+                <Label fx:id="lastNameEmptyLabel" layoutX="306.0" layoutY="92.0" text="This field is required."
+                       textFill="RED">
+                    <font>
+                        <Font name="System Bold" size="12.0"/>
+                    </font>
+                </Label>
+                <Label fx:id="birthDateEmptyLabel" layoutX="235.0" layoutY="318.0" text="This field is required."
+                       textFill="RED">
+                    <font>
+                        <Font name="System Bold" size="12.0"/>
+                    </font>
+                </Label>
+                <Label layoutX="197.0" layoutY="42.0" text="Already registered?" textFill="#f0ebeb">
+                    <font>
+                        <Font size="14.0"/>
+                    </font>
+                </Label>
+                <Label fx:id="signInLabel" layoutX="323.0" layoutY="42.0" onMouseClicked="#openLoginTab"
+                       stylesheets="@../css/LabelStyle.css" text="Sign in" textFill="#583de2">
+                </Label>
+            </children>
+        </AnchorPane>
+    </center>
 </BorderPane>

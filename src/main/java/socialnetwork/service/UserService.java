@@ -1,5 +1,6 @@
 package socialnetwork.service;
 
+import socialnetwork.Utils.design.NotifyStatus;
 import socialnetwork.Utils.design.Observable;
 import socialnetwork.Utils.Parse;
 import socialnetwork.domain.entities.Friendship;
@@ -78,7 +79,7 @@ public class UserService extends Observable {
         User returnedUser = userRepository.save(user);
         if (returnedUser == null) {
             setChanged();
-            notifyObservers();
+            notifyObservers(NotifyStatus.CREATE_USER);
             return true;
         }
         return false;
