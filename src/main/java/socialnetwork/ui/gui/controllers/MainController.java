@@ -2,7 +2,6 @@ package socialnetwork.ui.gui.controllers;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -10,6 +9,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import socialnetwork.Utils.Constants;
@@ -90,6 +90,8 @@ public class MainController implements Observer {
     private ListView<Chat> chatList;
     @FXML
     private TextArea messagesTextArea;
+    @FXML
+    private Button createGroupChatButton;
 
     public void setServices() {
         this.userService = MainGUI.getUserService();
@@ -216,7 +218,9 @@ public class MainController implements Observer {
 
     public void filterUsers(KeyEvent keyEvent) {
         String filter = filterUsersTextField.getText();
-        List<User> userList = StreamSupport.stream(userService.findAllUsers().spliterator(), false)
+        System.out.println(filter);
+        List<User> userList = StreamSupport
+                .stream(userService.findAllUsers().spliterator(), false)
                 .filter(x -> (x.getFirstName() + " " + x.getLastName()).toLowerCase().contains(filter.toLowerCase()))
                 .collect(Collectors.toList());
         userList.removeIf(friendsModel::contains);
@@ -393,7 +397,7 @@ public class MainController implements Observer {
     public void handleSendMessage(MouseEvent mouseEvent) {
         Chat selectedChat = chatList.getSelectionModel().getSelectedItem();
         if (!messageTextField.getText().trim().equals("")) {
-            messageService.sendMessage(LoginController.loggedUser, new HashMap<String, String>() {{
+            messageService.sendMessage(LoginController.loggedUser, new HashMap<>() {{
                 put("to", selectedChat.getID().toString());
                 put("message", messageTextField.getText());
                 put("reply", null);
@@ -401,5 +405,20 @@ public class MainController implements Observer {
             messageTextField.setText("");
             chatList.getSelectionModel().select(selectedChat);
         }
+    }
+
+    public void handleCreateGroupChat(MouseEvent mouseEvent) throws IOException {
+
+        FXMLLoader loader = new FXMLLoader();
+        loader.setLocation(getClass().getResource("/views/groupChatLayout.fxml"));
+        AnchorPane root = loader.load();
+
+        Stage groupChatStage = new Stage();
+        groupChatStage.setTitle("Create Group Chat");
+
+
+        Scene groupChatScene = new Scene(root);
+        groupChatStage.setScene(groupChatScene);
+        groupChatStage.show();
     }
 }

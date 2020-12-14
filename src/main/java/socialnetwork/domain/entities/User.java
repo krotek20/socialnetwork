@@ -126,15 +126,10 @@ public class User implements Entity<Long> {
     @Override
     public String toString() {
         // TODO: Encrypt password
-        StringJoiner joiner = new StringJoiner(";");
-        joiner.add(String.valueOf(id))
-                .add(firstName)
+        StringJoiner joiner = new StringJoiner(" ");
+        joiner.add(firstName)
                 .add(lastName)
-                .add(email)
-                .add(password)
-                .add(birthDate.toString())
-                .add(gender.toString())
-                .add(role.toString());
+                ;
         return joiner.toString();
     }
 

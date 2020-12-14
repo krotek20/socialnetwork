@@ -69,7 +69,7 @@ public class LoginController {
         registerButton.setDisable(false);
     }
 
-    public void handleRegisterButton(MouseEvent mouseEvent) throws IOException{
+    public void handleRegisterButton(MouseEvent mouseEvent) throws IOException {
         Stage loginStage = (Stage) loginButton.getScene().getWindow();
         loginStage.close();
 
