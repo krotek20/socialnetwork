@@ -302,7 +302,6 @@ public class MainController implements Observer {
                 cancelRequestButton.setVisible(true);
             }
         }
-
     }
 
     public void showFriendlistButtons(MouseEvent mouseEvent) {
@@ -397,14 +396,14 @@ public class MainController implements Observer {
     public void handleSendMessage(MouseEvent mouseEvent) {
         Chat selectedChat = chatList.getSelectionModel().getSelectedItem();
         if (!messageTextField.getText().trim().equals("")) {
-            messageService.sendMessage(LoginController.loggedUser, new HashMap<>() {{
+            messageService.sendMessage(LoginController.loggedUser, new HashMap<String, String>() {{
                 put("to", selectedChat.getID().toString());
                 put("message", messageTextField.getText());
                 put("reply", null);
             }});
             messageTextField.setText("");
-            chatList.getSelectionModel().select(selectedChat);
         }
+        chatList.getSelectionModel().select(selectedChat);
     }
 
     public void handleCreateGroupChat(MouseEvent mouseEvent) throws IOException {

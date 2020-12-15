@@ -1,6 +1,5 @@
 package socialnetwork.repository.database;
 
-import socialnetwork.domain.entities.Friendship;
 import socialnetwork.domain.entities.Notification;
 import socialnetwork.domain.entities.User;
 import socialnetwork.domain.enums.NotificationStatus;
@@ -10,12 +9,9 @@ import socialnetwork.domain.validators.ValidationException;
 import socialnetwork.domain.validators.Validator;
 import socialnetwork.repository.Repository;
 import socialnetwork.repository.RepositoryException;
-import socialnetwork.ui.gui.MainGUI;
 import socialnetwork.ui.gui.controllers.LoginController;
-import socialnetwork.ui.tui.BaseTUI;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,20 +22,19 @@ public class NotificationDBRepository
         implements Repository<Long, Notification> {
     private final UserDBRepository userDBRepository;
 
-    public NotificationDBRepository(String url, String username, String password, Validator<Notification> validator) {
-        super(validator, username, password, url);
-        this.userDBRepository = new UserDBRepository(url, username, password, new UserValidator());
-        this.findAll();
+    public NotificationDBRepository(Validator<Notification> validator) {
+        super(validator);
+        this.userDBRepository = new UserDBRepository(new UserValidator());
     }
 
     @Override
-    public Notification extractEntity(ResultSet resultSet) throws SQLException {
-        long id = resultSet.getLong("ID_NOTIFICATION");
-        long fromID = resultSet.getLong("FROM_ID_USER");
-        short typeShort = resultSet.getShort("NOTIFICATION_TYPE");
-        String entityText = resultSet.getString("ENTITY_TEXT");
-        String notificationText = resultSet.getString("NOTIFICATION_TEXT");
-        LocalDateTime timestamp = resultSet.getTimestamp("NOTIFICATION_TIMESTAMP").toLocalDateTime();
+    public Notification extractEntity(Map<String, Object> resultSet) {
+        long id = (long) resultSet.get("ID_NOTIFICATION");
+        long fromID = (long) resultSet.get("FROM_ID_USER");
+        short typeShort = ((Integer) resultSet.get("NOTIFICATION_TYPE")).shortValue();
+        String entityText = (String) resultSet.get("ENTITY_TEXT");
+        String notificationText = (String) resultSet.get("NOTIFICATION_TEXT");
+        LocalDateTime timestamp = ((Timestamp) resultSet.get("NOTIFICATION_TIMESTAMP")).toLocalDateTime();
 
         Map<User, NotificationStatus> notifiedUsers = new HashMap<>();
         User from = userDBRepository.findOne(fromID);

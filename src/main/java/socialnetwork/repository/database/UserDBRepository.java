@@ -8,26 +8,26 @@ import socialnetwork.domain.validators.Validator;
 import socialnetwork.repository.Repository;
 import socialnetwork.repository.RepositoryException;
 
-import java.sql.*;
 import java.time.LocalDate;
+import java.sql.Date;
+import java.util.Map;
 
 public class UserDBRepository extends AbstractDBRepository<Long, User> implements Repository<Long, User> {
 
-    public UserDBRepository(String url, String username, String password, Validator<User> validator) {
-        super(validator, username, password, url);
-        this.findAll();
+    public UserDBRepository(Validator<User> validator) {
+        super(validator);
     }
 
     @Override
-    public User extractEntity(ResultSet resultSet) throws SQLException {
-        long id = resultSet.getLong("ID_USER");
-        String firstName = resultSet.getString("FIRST_NAME");
-        String lastName = resultSet.getString("LAST_NAME");
-        String email = resultSet.getString("EMAIL");
-        String password = resultSet.getString("PASSWORD");
-        LocalDate birthDate = resultSet.getDate("BIRTH_DATE").toLocalDate();
-        Gender gender = Gender.valueOf(resultSet.getString("GENDER"));
-        Role role = Role.valueOf(resultSet.getString("ROLE"));
+    public User extractEntity(Map<String, Object> resultSet) {
+        long id = (long) resultSet.get("ID_USER");
+        String firstName = (String) resultSet.get("FIRST_NAME");
+        String lastName = (String) resultSet.get("LAST_NAME");
+        String email = (String) resultSet.get("EMAIL");
+        String password = (String) resultSet.get("PASSWORD");
+        LocalDate birthDate = ((Date) resultSet.get("BIRTH_DATE")).toLocalDate();
+        Gender gender = Gender.valueOf((String) resultSet.get("GENDER"));
+        Role role = Role.valueOf((String) resultSet.get("ROLE"));
 
         User user = new User(firstName, lastName, email, password, birthDate, gender);
         user.setID(id);

@@ -1,7 +1,5 @@
 package socialnetwork;
 
-import socialnetwork.config.ApplicationContext;
-
 import socialnetwork.domain.entities.*;
 import socialnetwork.domain.Tuple;
 import socialnetwork.domain.validators.*;
@@ -16,22 +14,12 @@ import socialnetwork.ui.gui.MainGUI;
 
 public class Main {
     public static void main(String[] args) {
-        // Database handlers
-        String url = ApplicationContext.getPROPERTIES().getProperty("data.socialnetwork.url");
-        String username = ApplicationContext.getPROPERTIES().getProperty("data.socialnetwork.username");
-        String password = ApplicationContext.getPROPERTIES().getProperty("data.socialnetwork.password");
-
         // Database repositories
-        Repository<Long, User> userDBRepository = new UserDBRepository(
-                url, username, password, new UserValidator());
-        Repository<Tuple<Long, Long>, Friendship> friendshipDBRepository = new FriendshipDBRepository(
-                url, username, password, new FriendshipValidator());
-        Repository<Long, Chat> chatDBRepository = new ChatDBRepository(
-                url, username, password, new ChatValidator());
-        Repository<Long, Message> messageDBRepository = new MessageDBRepository(
-                url, username, password, new MessageValidator());
-        Repository<Long, Notification> notificationDBRepository = new NotificationDBRepository(
-                url, username, password, new NotificationValidator());
+        Repository<Long, User> userDBRepository = new UserDBRepository(new UserValidator());
+        Repository<Tuple<Long, Long>, Friendship> friendshipDBRepository = new FriendshipDBRepository(new FriendshipValidator());
+        Repository<Long, Chat> chatDBRepository = new ChatDBRepository(new ChatValidator());
+        Repository<Long, Message> messageDBRepository = new MessageDBRepository(new MessageValidator());
+        Repository<Long, Notification> notificationDBRepository = new NotificationDBRepository(new NotificationValidator());
 
         // Services
         UserService userService = new UserService(
