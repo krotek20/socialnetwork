@@ -91,7 +91,8 @@ public class GroupChatController implements Observer {
 
         chatService.createChat(groupNameTextField.getText(), usersMap, LoginController.loggedUser);
 
-        AlertBox.showMessage(null, Alert.AlertType.CONFIRMATION, "Group Chat Created!", "Your group chat has been created.");
+        AlertBox.showMessage(null, Alert.AlertType.CONFIRMATION,
+                "Group Chat Created!", "Your group chat has been created.");
         Stage groupChatStage = (Stage) createGroupChatButton.getScene().getWindow();
         groupChatStage.close();
     }

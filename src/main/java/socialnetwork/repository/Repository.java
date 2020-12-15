@@ -3,6 +3,8 @@ package socialnetwork.repository;
 import socialnetwork.domain.Entity;
 import socialnetwork.domain.validators.ValidationException;
 
+import java.sql.SQLException;
+
 /**
  * CRUD operations repository interface
  *

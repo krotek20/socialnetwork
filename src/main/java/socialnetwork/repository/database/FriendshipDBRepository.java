@@ -8,25 +8,25 @@ import socialnetwork.domain.validators.Validator;
 import socialnetwork.repository.Repository;
 import socialnetwork.repository.RepositoryException;
 
-import java.sql.*;
+import java.sql.Timestamp;
+import java.util.Map;
 
 public class FriendshipDBRepository
         extends AbstractDBRepository<Tuple<Long, Long>, Friendship>
         implements Repository<Tuple<Long, Long>, Friendship> {
 
-    public FriendshipDBRepository(String url, String username, String password, Validator<Friendship> validator) {
-        super(validator, username, password, url);
-        this.findAll();
+    public FriendshipDBRepository(Validator<Friendship> validator) {
+        super(validator);
     }
 
     @Override
-    public Friendship extractEntity(ResultSet resultSet) throws SQLException {
+    public Friendship extractEntity(Map<String, Object> resultSet) {
         Friendship friendship = new Friendship(
-                resultSet.getLong("FIRST_ID"),
-                resultSet.getLong("SECOND_ID"),
-                resultSet.getLong("ID_NOTIFICATION"));
-        friendship.setDate(resultSet.getTimestamp("DATE").toLocalDateTime());
-        short dbStatus = resultSet.getShort("FRIENDSHIP_STATUS");
+                (long) resultSet.get("FIRST_ID"),
+                (long) resultSet.get("SECOND_ID"),
+                (long) resultSet.get("ID_NOTIFICATION"));
+        friendship.setDate(((Timestamp) resultSet.get("DATE")).toLocalDateTime());
+        short dbStatus = ((Integer) resultSet.get("FRIENDSHIP_STATUS")).shortValue();
         friendship.setStatus(FriendshipStatus.fromValue(dbStatus));
         return friendship;
     }

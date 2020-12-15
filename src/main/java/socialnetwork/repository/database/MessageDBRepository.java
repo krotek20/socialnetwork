@@ -10,30 +10,29 @@ import socialnetwork.domain.validators.Validator;
 import socialnetwork.repository.Repository;
 import socialnetwork.repository.RepositoryException;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.Map;
 
 public class MessageDBRepository extends AbstractDBRepository<Long, Message> implements Repository<Long, Message> {
     private final UserDBRepository userDBRepository;
     private final ChatDBRepository chatDBRepository;
 
-    public MessageDBRepository(String url, String username, String password, Validator<Message> validator) {
-        super(validator, username, password, url);
-        this.userDBRepository = new UserDBRepository(url, username, password, new UserValidator());
-        this.chatDBRepository = new ChatDBRepository(url, username, password, new ChatValidator());
-        this.findAll();
+    public MessageDBRepository(Validator<Message> validator) {
+        super(validator);
+        this.userDBRepository = new UserDBRepository(new UserValidator());
+        this.chatDBRepository = new ChatDBRepository(new ChatValidator());
     }
 
     @Override
-    public Message extractEntity(ResultSet resultSet) throws SQLException {
-        long id = resultSet.getLong("ID_MESSAGE");
-        long userID = resultSet.getLong("ID_USER");
-        long chatID = resultSet.getLong("ID_CHAT");
-        long notificationID = resultSet.getLong("ID_NOTIFICATION");
-        String messageText = resultSet.getString("MESSAGE_TEXT");
-        String replyText = resultSet.getString("REPLY_TEXT");
-        LocalDateTime timestamp = resultSet.getTimestamp("MESSAGE_TIMESTAMP").toLocalDateTime();
+    public Message extractEntity(Map<String, Object> resultSet) {
+        long id = (long) resultSet.get("ID_MESSAGE");
+        long userID = (long) resultSet.get("ID_USER");
+        long chatID = (long) resultSet.get("ID_CHAT");
+        long notificationID = (long) resultSet.get("ID_NOTIFICATION");
+        String messageText = (String) resultSet.get("MESSAGE_TEXT");
+        String replyText = (String) resultSet.get("REPLY_TEXT");
+        LocalDateTime timestamp = ((Timestamp) resultSet.get("MESSAGE_TIMESTAMP")).toLocalDateTime();
 
         User from = userDBRepository.findOne(userID);
         Chat to = chatDBRepository.findOne(chatID);

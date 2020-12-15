@@ -8,26 +8,25 @@ import socialnetwork.domain.validators.Validator;
 import socialnetwork.repository.Repository;
 import socialnetwork.repository.RepositoryException;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Set;
 
 public class ChatDBRepository extends AbstractDBRepository<Long, Chat> implements Repository<Long, Chat> {
     private final UserDBRepository userDBRepository;
 
-    public ChatDBRepository(String url, String username, String password, Validator<Chat> validator) {
-        super(validator, username, password, url);
-        this.userDBRepository = new UserDBRepository(url, username, password, new UserValidator());
-        this.findAll();
+    public ChatDBRepository(Validator<Chat> validator) {
+        super(validator);
+        this.userDBRepository = new UserDBRepository(new UserValidator());
     }
 
     @Override
-    public Chat extractEntity(ResultSet resultSet) throws SQLException {
-        long id = resultSet.getLong("ID_CHAT");
-        long notificationID = resultSet.getLong("ID_NOTIFICATION");
-        String title = resultSet.getString("TITLE");
-        LocalDateTime dateTime = resultSet.getTimestamp("DATE").toLocalDateTime();
+    public Chat extractEntity(Map<String, Object> resultSet) {
+        long id = (long) resultSet.get("ID_CHAT");
+        long notificationID = (long) resultSet.get("ID_NOTIFICATION");
+        String title = (String) resultSet.get("TITLE");
+        LocalDateTime dateTime = ((Timestamp) resultSet.get("DATE")).toLocalDateTime();
 
         Chat chat = new Chat(title, notificationID);
         chat.setID(id);
