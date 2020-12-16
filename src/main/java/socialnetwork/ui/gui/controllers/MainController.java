@@ -7,6 +7,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -17,6 +19,8 @@ import socialnetwork.Utils.design.NotifyStatus;
 import socialnetwork.Utils.design.Observer;
 import socialnetwork.domain.entities.*;
 import socialnetwork.domain.enums.FriendshipStatus;
+import socialnetwork.domain.enums.Gender;
+import socialnetwork.domain.enums.NotificationType;
 import socialnetwork.domain.validators.ValidationException;
 import socialnetwork.repository.RepositoryException;
 import socialnetwork.service.*;
@@ -75,8 +79,6 @@ public class MainController implements Observer {
     @FXML
     private Button logoutButton;
     @FXML
-    private Button cancelRequestButton;
-    @FXML
     private Button openFriendChatButton;
     @FXML
     private Button openChatButton;
@@ -92,6 +94,8 @@ public class MainController implements Observer {
     private TextArea messagesTextArea;
     @FXML
     private Button createGroupChatButton;
+    @FXML
+    private ImageView friendReqImage;
 
     public void setServices() {
         this.userService = MainGUI.getUserService();
@@ -117,8 +121,18 @@ public class MainController implements Observer {
         deleteFriendButton.setVisible(false);
         openChatButton.setVisible(false);
         openFriendChatButton.setVisible(false);
-        cancelRequestButton.setVisible(false);
         activeChat.setText("");
+
+        tabPane.widthProperty().addListener((observable, oldValue, newValue) ->
+        {
+            tabPane.setTabMinWidth(tabPane.getWidth() / tabPane.getTabs().size());
+            tabPane.setTabMaxWidth(tabPane.getWidth() / tabPane.getTabs().size());
+        });
+
+        Image image = new Image(getClass().getResourceAsStream((
+                LoginController.loggedUser.getGender() == Gender.MALE ?
+                        "/images/male_fr.png" : "/images/female_fr.png")));
+        friendReqImage.setImage(image);
 
         userTableColumnName.setCellValueFactory(new PropertyValueFactory<>("lastName"));
         userTableColumnSurname.setCellValueFactory(new PropertyValueFactory<>("firstName"));
@@ -213,7 +227,6 @@ public class MainController implements Observer {
             }
         }
         addFriendButton.setVisible(false);
-        cancelRequestButton.setVisible(true);
     }
 
     public void filterUsers(KeyEvent keyEvent) {
@@ -282,9 +295,21 @@ public class MainController implements Observer {
         loginStage.show();
     }
 
+    public void handleFriendRequests(MouseEvent mouseEvent) throws IOException {
+        FXMLLoader loader = new FXMLLoader();
+        loader.setLocation(getClass().getResource("/views/friendRequestsLayout.fxml"));
+        AnchorPane root = loader.load();
+
+        Stage friendRequestsStage = new Stage();
+        friendRequestsStage.setTitle("Friend requests");
+
+        Scene friendRequestsScene = new Scene(root);
+        friendRequestsStage.setScene(friendRequestsScene);
+        friendRequestsStage.show();
+    }
+
     public void showUsersButtons(MouseEvent mouseEvent) {
         addFriendButton.setVisible(false);
-        cancelRequestButton.setVisible(false);
         openChatButton.setVisible(true);
         User user = usersTable.getSelectionModel().getSelectedItem();
         if (user == null) {
@@ -296,10 +321,8 @@ public class MainController implements Observer {
             friendshipMap.put("id1", id1);
             friendshipMap.put("id2", id2);
             Friendship friendship = friendshipService.findOneFriendship(friendshipMap);
-            if (friendship == null)
+            if (friendship == null) {
                 addFriendButton.setVisible(true);
-            else if (friendship.getStatus() == FriendshipStatus.PENDING) {
-                cancelRequestButton.setVisible(true);
             }
         }
     }
@@ -309,25 +332,7 @@ public class MainController implements Observer {
         openFriendChatButton.setVisible(true);
     }
 
-    public void handleCancelRequest(MouseEvent mouseEvent) {
-        User user = usersTable.getSelectionModel().getSelectedItem();
-        String id1 = user.getID().toString();
-        String id2 = LoginController.loggedUser.getID().toString();
-        Map<String, String> friendshipMap = new HashMap<>();
-        friendshipMap.put("id1", id1);
-        friendshipMap.put("id2", id2);
-        try {
-            friendshipService.deleteFriendship(friendshipMap);
-            AlertBox.showMessage(null, Alert.AlertType.CONFIRMATION, "Request cancelled",
-                    "Friend request has been cancelled.");
-        } catch (RepositoryException e) {
-            AlertBox.showErrorMessage(null, e.getMessage());
-        }
-        cancelRequestButton.setVisible(false);
-        addFriendButton.setVisible(true);
-    }
-
-    public void handleOpenChat(MouseEvent mouseEvent) {
+    public void handleOpenChatFriends(MouseEvent mouseEvent) {
         User friend = friendsTable.getSelectionModel().getSelectedItem();
         tabPane.getSelectionModel().select(chatsTab);
         List<Chat> chats = chatService.readAllChats(LoginController.loggedUser);
@@ -342,15 +347,40 @@ public class MainController implements Observer {
         }
     }
 
+    public void handleOpenChatUsers(MouseEvent mouseEvent) {
+        User user = usersTable.getSelectionModel().getSelectedItem();
+        tabPane.getSelectionModel().select(chatsTab);
+        List<Chat> chats = chatService.readAllChats(LoginController.loggedUser);
+        for (Chat chat : chats) {
+            List<User> users = new ArrayList<>(chat.getUsers());
+            if (chat.getChatSize() == 2 && (users.get(0).getID().equals(user.getID())
+                    || users.get(1).getID().equals(user.getID()))) {
+                chatList.getSelectionModel().select(chat);
+                displayChatName(null);
+                return;
+            }
+        }
+        Chat chat = chatService.createChat("Private chat", new HashMap<String, String>() {{
+            put("id1", LoginController.loggedUser.getID().toString());
+            put("id2", user.getID().toString());
+        }}, LoginController.loggedUser);
+        chatList.getSelectionModel().select(chat);
+        displayChatName(null);
+    }
+
     // Notifications tab functionalities
     public void handleNotificationsClick(MouseEvent mouseEvent) {
-        acceptButton.setVisible(true);
-        rejectButton.setVisible(true);
         Notification notification = notificationList.getSelectionModel().getSelectedItem();
-        if (mouseEvent.getClickCount() == 2) {
-            AlertBox.showMessage(null, Alert.AlertType.INFORMATION, notification.getType() + " " +
-                            notification.getTimestamp().format(Constants.DATE_TIME_FORMATTER),
-                    notification.getEntityText());
+        if (notification != null) {
+            if (notification.getType() == NotificationType.FRIENDSHIP) {
+                acceptButton.setVisible(true);
+                rejectButton.setVisible(true);
+            }
+            if (mouseEvent.getClickCount() == 2) {
+                AlertBox.showMessage(null, Alert.AlertType.INFORMATION, notification.getType() + " " +
+                                notification.getTimestamp().format(Constants.DATE_TIME_FORMATTER),
+                        notification.getEntityText());
+            }
         }
     }
 
@@ -388,9 +418,11 @@ public class MainController implements Observer {
     // Chats tab functionalities
     public void displayChatName(MouseEvent mouseEvent) {
         Chat selectedChat = chatList.getSelectionModel().getSelectedItem();
-        activeChat.setText(selectedChat.toString());
-        initChatLog();
-        chatList.getSelectionModel().select(selectedChat);
+        if (selectedChat != null) {
+            activeChat.setText(selectedChat.toString());
+            initChatLog();
+            chatList.getSelectionModel().select(selectedChat);
+        }
     }
 
     public void handleSendMessage(MouseEvent mouseEvent) {
@@ -407,7 +439,6 @@ public class MainController implements Observer {
     }
 
     public void handleCreateGroupChat(MouseEvent mouseEvent) throws IOException {
-
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(getClass().getResource("/views/groupChatLayout.fxml"));
         AnchorPane root = loader.load();
