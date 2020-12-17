@@ -59,7 +59,7 @@ public class ChatTUI extends BaseTUI {
         }
 
         System.out.println("Operation " +
-                (chatService.createChat(name, chatMap, loggedUser) ?
+                (chatService.createChat(name, chatMap, loggedUser) != null ?
                         "successful" : "failed"));
     }
 }

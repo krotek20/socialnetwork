@@ -37,6 +37,7 @@ public class LoginController {
     public void handleLoginButton() throws IOException {
         loginButton.setDisable(true);
         registerButton.setDisable(true);
+        loginFailedLabel.setText("");
 
         Map<String, String> loginMap = new HashMap<String, String>() {{
             put("email", emailLoginText.getText());

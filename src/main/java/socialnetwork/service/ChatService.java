@@ -41,7 +41,7 @@ public class ChatService extends Observable {
      * @throws ValidationException when at least one value is invalid.
      * @throws ServiceException    when input user ids are not numbers.
      */
-    public boolean createChat(String title, Map<String, String> ids, User loggedUser)
+    public Chat createChat(String title, Map<String, String> ids, User loggedUser)
             throws ValidationException, RepositoryException, ServiceException {
         Set<User> users = new HashSet<>();
         for (Map.Entry<String, String> userID : ids.entrySet()) {
@@ -64,9 +64,9 @@ public class ChatService extends Observable {
         if (chatRepository.save(chat) == null) {
             setChanged();
             notifyObservers(NotifyStatus.CHAT);
-            return true;
+            return chat;
         }
-        return false;
+        return null;
     }
 
     /**

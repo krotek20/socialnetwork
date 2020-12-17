@@ -218,8 +218,7 @@ public class FriendshipService extends Observable {
     public boolean deleteFriendship(Map<String, String> friendshipMap) throws RepositoryException, ServiceException {
         long id1 = Parse.safeParseLong(friendshipMap.get("id1"));
         long id2 = Parse.safeParseLong(friendshipMap.get("id2"));
-        Friendship friendship = friendshipRepository.findOne(new Tuple<>(id1, id2));
-        NotificationService.deleteNotification(friendship.getNotificationID());
+
         boolean status = friendshipRepository.delete(new Tuple<>(id1, id2)) != null;
         if (status) {
             setChanged();

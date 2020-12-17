@@ -39,7 +39,7 @@ public class GroupChatController implements Observer {
     @FXML
     private TextField filterUsersTextField;
     @FXML
-    private TextField groupNameTextField;
+    private TextField groupTitleTextField;
     @FXML
     private ListView<User> addedUsersList;
 
@@ -88,8 +88,12 @@ public class GroupChatController implements Observer {
         for (User user : usersList) {
             usersMap.put(user.getLastName(), user.getID().toString());
         }
+        String title = groupTitleTextField.getText();
+        if (title.trim().equals("")) {
+            title = "Default";
+        }
 
-        chatService.createChat(groupNameTextField.getText(), usersMap, LoginController.loggedUser);
+        chatService.createChat(title, usersMap, LoginController.loggedUser);
 
         AlertBox.showMessage(null, Alert.AlertType.CONFIRMATION,
                 "Group Chat Created!", "Your group chat has been created.");
