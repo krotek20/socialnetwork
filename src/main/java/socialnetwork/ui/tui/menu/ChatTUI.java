@@ -37,7 +37,7 @@ public class ChatTUI extends BaseTUI {
 
     private void displayAllMessages() {
         String chatID = readOne("id");
-        System.out.println(messageService.readAllMessages(loggedUser, chatID));
+        System.out.println(messageService.readAllMessagesFromChat(loggedUser, chatID));
     }
 
     private void displayAllChats() {

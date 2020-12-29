@@ -127,9 +127,7 @@ public class User implements Entity<Long> {
     public String toString() {
         // TODO: Encrypt password
         StringJoiner joiner = new StringJoiner(" ");
-        joiner.add(firstName)
-                .add(lastName)
-                ;
+        joiner.add(firstName).add(lastName);
         return joiner.toString();
     }
 

@@ -219,12 +219,11 @@ public class FriendshipService extends Observable {
         long id1 = Parse.safeParseLong(friendshipMap.get("id1"));
         long id2 = Parse.safeParseLong(friendshipMap.get("id2"));
 
-        boolean status = friendshipRepository.delete(new Tuple<>(id1, id2)) != null;
-        if (status) {
-            setChanged();
-            notifyObservers(NotifyStatus.FRIEND_REQUEST);
-        }
-        return status;
+        Friendship friendship = friendshipRepository.delete(new Tuple<>(id1, id2));
+        NotificationService.deleteNotification(friendship.getNotificationID());
+        setChanged();
+        notifyObservers(NotifyStatus.FRIEND_REQUEST);
+        return true;
     }
 
     /**

@@ -10,6 +10,7 @@ import socialnetwork.domain.enums.NotificationType;
 import socialnetwork.domain.validators.ValidationException;
 import socialnetwork.repository.Repository;
 import socialnetwork.repository.RepositoryException;
+import socialnetwork.ui.gui.controllers.LoginController;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -81,5 +82,24 @@ public class ChatService extends Observable {
                         .stream()
                         .anyMatch(y -> y.getID().equals(loggedUser.getID())))
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Find a private chat entity between two users.
+     *
+     * @param loggedUser user currently logged in.
+     * @param friend     a friend of logged in user.
+     * @return chat entity of the private chat.
+     */
+    public Chat findPrivateChat(User loggedUser, User friend) {
+        List<Chat> chats = readAllChats(loggedUser);
+        for (Chat chat : chats) {
+            List<User> users = new ArrayList<>(chat.getUsers());
+            if (chat.getChatSize() == 2 && (users.get(0).getID().equals(friend.getID())
+                    || users.get(1).getID().equals(friend.getID()))) {
+                return chat;
+            }
+        }
+        return null;
     }
 }

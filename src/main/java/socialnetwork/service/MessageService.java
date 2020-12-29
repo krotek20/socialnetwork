@@ -9,10 +9,12 @@ import socialnetwork.domain.enums.NotificationType;
 import socialnetwork.domain.validators.ValidationException;
 import socialnetwork.repository.Repository;
 import socialnetwork.repository.RepositoryException;
+import socialnetwork.ui.gui.controllers.LoginController;
 
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 /**
@@ -64,6 +66,7 @@ public class MessageService extends Observable {
                 NotificationType.MESSAGE, "New message!", LocalDateTime.now());
 
         Message message = new Message(from, to, messageText.trim(), replyText, notification.getID());
+        message.setCount(message.getID());
         if (messageRepository.save(message) == null) {
             setChanged();
             notifyObservers(NotifyStatus.MESSAGE);
@@ -78,11 +81,11 @@ public class MessageService extends Observable {
      * @param from   the user who wants to read the messages.
      * @param chatID string representing the ID of the chat
      *               user {@code from} wants to read messages from.
-     * @return a list of strings representing the messages of the specified chat.
+     * @return a list of all messages in the specified chat.
      * @throws RepositoryException if the chat was not found.
      * @throws ServiceException    if the user is not in the requested chat.
      */
-    public List<String> readAllMessages(User from, String chatID) throws ServiceException, RepositoryException {
+    public List<Message> readAllMessagesFromChat(User from, String chatID) throws ServiceException, RepositoryException {
         Chat to = chatRepository.findOne(Parse.safeParseLong(chatID));
         if (to == null) {
             throw new RepositoryException("Chat not found!");
@@ -94,8 +97,30 @@ public class MessageService extends Observable {
                 .stream(messageRepository.findAll().spliterator(), false)
                 .filter(x -> x.getChat().equals(to))
                 .sorted(Comparator.comparing(Message::getTimestamp))
-                .map(Message::toString)
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Reads all messages of a user.
+     *
+     * @param from the user who wants to read the messages.
+     * @return a list of all messages of this user.
+     */
+    public List<Message> readAllMessages(User from) {
+        List<Chat> chats = StreamSupport.stream(chatRepository.findAll().spliterator(), false)
+                .filter(x -> x.getUsers()
+                        .stream()
+                        .anyMatch(y -> y.getID().equals(from.getID())))
+                .collect(Collectors.toList());
+        List<Message> allMessages = new ArrayList<>();
+        for (Chat chat : chats) {
+            List<Message> currentChatMessages =
+                    readAllMessagesFromChat(LoginController.loggedUser, chat.getID().toString());
+            allMessages = Stream.of(allMessages, currentChatMessages)
+                    .flatMap(Collection::stream)
+                    .collect(Collectors.toList());
+        }
+        return allMessages;
     }
 
     /**
