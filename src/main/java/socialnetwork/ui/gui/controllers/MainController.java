@@ -1,5 +1,6 @@
 package socialnetwork.ui.gui.controllers;
 
+import com.itextpdf.text.DocumentException;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -15,6 +16,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import socialnetwork.Utils.Constants;
+import socialnetwork.Utils.ExportPDF;
 import socialnetwork.Utils.design.NotifyStatus;
 import socialnetwork.Utils.design.Observer;
 import socialnetwork.domain.entities.*;
@@ -26,11 +28,9 @@ import socialnetwork.repository.RepositoryException;
 import socialnetwork.service.*;
 import socialnetwork.ui.gui.MainGUI;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -87,15 +87,23 @@ public class MainController implements Observer {
     @FXML
     private Button sendMessageButton;
     @FXML
+    private Button createGroupChatButton;
+    @FXML
+    private Button exportActivityButton;
+    @FXML
+    private Button exportPrivateButton;
+    @FXML
     private ListView<Notification> notificationList;
     @FXML
     private ListView<Chat> chatList;
     @FXML
     private TextArea messagesTextArea;
     @FXML
-    private Button createGroupChatButton;
-    @FXML
     private ImageView friendReqImage;
+    @FXML
+    private DatePicker fromDate;
+    @FXML
+    private DatePicker toDate;
 
     public void setServices() {
         this.userService = MainGUI.getUserService();
@@ -174,8 +182,11 @@ public class MainController implements Observer {
     private void initChatLog() {
         Chat chat = chatList.getSelectionModel().getSelectedItem();
         if (chat != null) {
-            List<String> messagesList = messageService.readAllMessages(
-                    LoginController.loggedUser, chat.getID().toString());
+            List<String> messagesList = messageService
+                    .readAllMessagesFromChat(LoginController.loggedUser, chat.getID().toString())
+                    .stream()
+                    .map(Message::toString)
+                    .collect(Collectors.toList());
             StringBuilder builder = new StringBuilder();
             for (String message : messagesList) {
                 builder.append("\n").append(message);
@@ -366,6 +377,97 @@ public class MainController implements Observer {
         }}, LoginController.loggedUser);
         chatList.getSelectionModel().select(chat);
         displayChatName(null);
+    }
+
+    private boolean verifyDatePickers() {
+        try {
+            String from = fromDate.getValue().toString();
+            String to = toDate.getValue().toString();
+        } catch (NullPointerException e) {
+            AlertBox.showErrorMessage(null, "Please select the desired period!");
+            return false;
+        }
+        if (fromDate.getValue().compareTo(toDate.getValue()) > 0) {
+            AlertBox.showErrorMessage(null, "Please select a valid period!");
+            return false;
+        }
+        return true;
+    }
+
+    private void writeFriendships(List<Friendship> friendships, ExportPDF exportPDF) {
+        for (Friendship friendship : friendships) {
+            exportPDF.addRowToTable("FRIENDSHIP",
+                    (friendship.getID().getLeft().equals(LoginController.loggedUser.getID()) ?
+                            userService.findOneUser(friendship.getID().getRight().toString()).toString() :
+                            userService.findOneUser(friendship.getID().getLeft().toString()).toString()),
+                    friendship.getDate().format(Constants.DATE_TIME_FORMATTER));
+        }
+    }
+
+    private void writeMessages(List<Message> messages, ExportPDF exportPDF) {
+        for (Message message : messages) {
+            exportPDF.addRowToTable("MESSAGE", message.getFrom() + ": " + message.getMessageText(),
+                    message.getTimestamp().format(Constants.DATE_TIME_FORMATTER));
+        }
+    }
+
+    public void handleExportActivity(MouseEvent mouseEvent) {
+        if (verifyDatePickers()) {
+            ExportPDF exportPDF = new ExportPDF("src/main/resources/reports/report_activity.pdf");
+
+            // Find friendships
+            List<Friendship> friendships = userService.findFriendships(LoginController.loggedUser.getID())
+                    .stream()
+                    .filter(x -> x.getStatus().equals(FriendshipStatus.APPROVED))
+                    .filter(x -> x.getDate().toLocalDate().compareTo(fromDate.getValue()) >= 0 &&
+                            x.getDate().toLocalDate().compareTo(toDate.getValue()) <= 0)
+                    .collect(Collectors.toList());
+
+            // Write friendships
+            writeFriendships(friendships, exportPDF);
+
+            // Find messages
+            List<Message> messages = messageService.readAllMessages(LoginController.loggedUser)
+                    .stream()
+                    .filter(x -> x.getTimestamp().toLocalDate().compareTo(fromDate.getValue()) >= 0 &&
+                            x.getTimestamp().toLocalDate().compareTo(toDate.getValue()) <= 0)
+                    .collect(Collectors.toList());
+
+            // Write messages
+            writeMessages(messages, exportPDF);
+
+            try {
+                exportPDF.exportTable();
+                AlertBox.showMessage(null, Alert.AlertType.CONFIRMATION,
+                        "SUCCESS", "PDF successfully exported!");
+            } catch (DocumentException | FileNotFoundException e) {
+                AlertBox.showErrorMessage(null, "Export ERROR!");
+            }
+        }
+    }
+
+    public void handleExportPrivate(MouseEvent mouseEvent) {
+        User friend = friendsTable.getSelectionModel().getSelectedItem();
+        if (friend == null) {
+            AlertBox.showErrorMessage(null, "Please select a friend from the friends list!");
+        }
+        if (verifyDatePickers() && friend != null) {
+            ExportPDF exportPDF = new ExportPDF("src/main/resources/reports/report_private.pdf");
+
+            Chat chat = chatService.findPrivateChat(LoginController.loggedUser, friend);
+            List<Message> messages = messageService.readAllMessagesFromChat(
+                    LoginController.loggedUser, chat.getID().toString());
+
+            writeMessages(messages, exportPDF);
+
+            try {
+                exportPDF.exportTable();
+                AlertBox.showMessage(null, Alert.AlertType.CONFIRMATION,
+                        "SUCCESS", "PDF successfully exported!");
+            } catch (DocumentException | FileNotFoundException e) {
+                AlertBox.showErrorMessage(null, "Export ERROR!");
+            }
+        }
     }
 
     // Notifications tab functionalities
