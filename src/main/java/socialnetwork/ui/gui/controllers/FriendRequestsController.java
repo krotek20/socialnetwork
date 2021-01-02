@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class friendRequestsController implements Observer {
+public class FriendRequestsController implements Observer {
 
     private final ObservableList<User> requestsModel = FXCollections.observableArrayList();
     private FriendshipService friendshipService;
