@@ -106,7 +106,6 @@ public class Message implements Entity<Long> {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("[").append(timestamp.format(Constants.DATE_TIME_FORMATTER)).append("] ");
         if (LoginController.loggedUser.getID().equals(from.getID())) {
             builder.append("You: ");
         } else {

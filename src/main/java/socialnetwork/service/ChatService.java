@@ -102,4 +102,15 @@ public class ChatService extends Observable {
         }
         return null;
     }
+
+    /**
+     * Edits a current chat properties with the given ones.
+     *
+     * @param chat a specific chat entity with different properties.
+     */
+    public void updateChat(Chat chat) {
+        chatRepository.update(chat);
+        setChanged();
+        notifyObservers(NotifyStatus.CHAT);
+    }
 }

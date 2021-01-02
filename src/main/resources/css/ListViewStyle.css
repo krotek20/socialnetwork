@@ -10,6 +10,12 @@
 
 .list-cell:hover {
     -fx-background-color: #efa477;
+    -fx-cursor: hand;
+}
+
+.list-cell:empty {
+    -fx-opacity: 0;
+    -fx-cursor: default;
 }
 
 .list-cell {
@@ -18,4 +24,9 @@
 
 .list-view {
     -fx-background-color: #f0ebeb;
+}
+
+#messagesListView {
+    -fx-font-family: Arial;
+    -fx-font-size: 14;
 }

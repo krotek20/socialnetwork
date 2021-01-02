@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="$CONTROLLER_NAME$"
-            prefHeight="400.0" prefWidth="600.0" >
-
+<AnchorPane prefHeight="328.0" prefWidth="227.0" style="-fx-background-color: #4b4b4b;"
+            xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="socialnetwork.ui.gui.controllers.FriendRequestsController">
+    <children>
+        <ListView fx:id="requestsList" layoutX="13.0" layoutY="14.0" prefHeight="262.0" prefWidth="200.0"
+                  stylesheets="@../css/ListViewStyle.css" onMouseClicked="#handleUserSelection"/>
+        <Button id="filledButton" fx:id="cancelRequestButton" layoutX="68.0" layoutY="286.0" mnemonicParsing="false"
+                onMouseClicked="#handleCancelRequest" prefHeight="27.0" prefWidth="91.0"
+                stylesheets="@../css/ButtonStyle.css" text="Cancel Request"/>
+    </children>
 </AnchorPane>

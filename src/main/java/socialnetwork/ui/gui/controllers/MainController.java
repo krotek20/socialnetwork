@@ -5,15 +5,21 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.ImagePattern;
+import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import socialnetwork.Utils.Constants;
 import socialnetwork.Utils.ExportPDF;
@@ -44,7 +50,10 @@ public class MainController implements Observer {
     private final ObservableList<User> usersModel = FXCollections.observableArrayList();
     private final ObservableList<Chat> chatsModel = FXCollections.observableArrayList();
     private final ObservableList<User> friendsModel = FXCollections.observableArrayList();
+    private final ObservableList<Message> messagesModel = FXCollections.observableArrayList();
     private final ObservableList<Notification> notificationsModel = FXCollections.observableArrayList();
+
+    private Message lastSelectedMessage = null;
 
     @FXML
     private TabPane tabPane;
@@ -56,6 +65,8 @@ public class MainController implements Observer {
     private TextField filterFriendsTextField;
     @FXML
     private TextField messageTextField;
+    @FXML
+    private TextField editTitleTextField;
     @FXML
     private TableView<User> usersTable;
     @FXML
@@ -93,17 +104,23 @@ public class MainController implements Observer {
     @FXML
     private Button exportPrivateButton;
     @FXML
+    private Button editChatTitleButton;
+    @FXML
     private ListView<Notification> notificationList;
     @FXML
     private ListView<Chat> chatList;
     @FXML
-    private TextArea messagesTextArea;
+    private ListView<Message> messagesListView;
     @FXML
     private ImageView friendReqImage;
     @FXML
     private DatePicker fromDate;
     @FXML
     private DatePicker toDate;
+    @FXML
+    private Circle circledImage;
+    @FXML
+    private Label loggedUserName;
 
     public void setServices() {
         this.userService = MainGUI.getUserService();
@@ -129,6 +146,8 @@ public class MainController implements Observer {
         deleteFriendButton.setVisible(false);
         openChatButton.setVisible(false);
         openFriendChatButton.setVisible(false);
+        editChatTitleButton.setVisible(false);
+        editTitleTextField.setVisible(false);
         activeChat.setText("");
 
         tabPane.widthProperty().addListener((observable, oldValue, newValue) ->
@@ -142,6 +161,17 @@ public class MainController implements Observer {
                         "/images/male_fr.png" : "/images/female_fr.png")));
         friendReqImage.setImage(image);
 
+        circledImage.setStroke(Color.BLACK);
+        Image avatar = new Image("/images/default_avatar.jpg", false);
+        circledImage.setFill(new ImagePattern(avatar));
+        circledImage.setEffect(new DropShadow(+10d, 0d, +2d, Color.BLACK));
+
+        loggedUserName.setText(LoginController.loggedUser.getFirstName() + " " + LoginController.loggedUser.getLastName());
+        loggedUserName.setMaxWidth(Double.MAX_VALUE);
+        AnchorPane.setLeftAnchor(loggedUserName, 0.0);
+        AnchorPane.setRightAnchor(loggedUserName, 0.0);
+        loggedUserName.setAlignment(Pos.CENTER);
+
         userTableColumnName.setCellValueFactory(new PropertyValueFactory<>("lastName"));
         userTableColumnSurname.setCellValueFactory(new PropertyValueFactory<>("firstName"));
         friendsTableColumnName.setCellValueFactory(new PropertyValueFactory<>("lastName"));
@@ -150,6 +180,7 @@ public class MainController implements Observer {
         chatList.setItems(chatsModel);
         usersTable.setItems(usersModel);
         friendsTable.setItems(friendsModel);
+        messagesListView.setItems(messagesModel);
         notificationList.setItems(notificationsModel);
     }
 
@@ -182,16 +213,44 @@ public class MainController implements Observer {
     private void initChatLog() {
         Chat chat = chatList.getSelectionModel().getSelectedItem();
         if (chat != null) {
-            List<String> messagesList = messageService
-                    .readAllMessagesFromChat(LoginController.loggedUser, chat.getID().toString())
-                    .stream()
-                    .map(Message::toString)
-                    .collect(Collectors.toList());
-            StringBuilder builder = new StringBuilder();
-            for (String message : messagesList) {
-                builder.append("\n").append(message);
-            }
-            messagesTextArea.setText(builder.toString());
+            List<Message> messagesList = messageService.readAllMessagesFromChat(
+                    LoginController.loggedUser, chat.getID().toString());
+            messagesModel.setAll(messagesList);
+
+            messagesListView.setCellFactory(cell -> new ListCell<Message>() {
+                final Tooltip tooltip = new Tooltip();
+
+                @Override
+                protected void updateItem(Message message, boolean empty) {
+                    super.updateItem(message, empty);
+                    if (message == null || empty) {
+                        setText(null);
+                        setTooltip(null);
+                        setGraphic(null);
+                    } else {
+                        // set the width's
+                        setMinWidth(cell.getWidth());
+                        setMaxWidth(cell.getWidth());
+                        setPrefWidth(cell.getWidth());
+
+                        // allow wrapping
+                        setWrapText(true);
+
+                        setText(message.toString());
+                        String reply = "";
+                        if (!message.getReply().equals("null")) {
+                            reply = " REPLY TO: " + (message.getReply().length() > 30 ?
+                                    (message.getReply().substring(0, 25) + "...") : message.getReply());
+
+                        }
+                        tooltip.setText(message.getTimestamp().format(Constants.DATE_TIME_FORMATTER) + (
+                                message.getReply().equals("null") ? "" : reply
+                        ));
+                        setTooltip(tooltip);
+                    }
+                }
+            });
+            messagesListView.scrollTo((messagesListView.getItems().size() - 1));
         }
     }
 
@@ -477,11 +536,17 @@ public class MainController implements Observer {
             if (notification.getType() == NotificationType.FRIENDSHIP) {
                 acceptButton.setVisible(true);
                 rejectButton.setVisible(true);
+            } else {
+                acceptButton.setVisible(false);
+                rejectButton.setVisible(false);
             }
             if (mouseEvent.getClickCount() == 2) {
                 AlertBox.showMessage(null, Alert.AlertType.INFORMATION, notification.getType() + " " +
                                 notification.getTimestamp().format(Constants.DATE_TIME_FORMATTER),
                         notification.getEntityText());
+                notification.setUserNotificationStatus(LoginController.loggedUser);
+                NotificationService.updateSeenNotification(notification);
+                update(null);
             }
         }
     }
@@ -522,19 +587,58 @@ public class MainController implements Observer {
         Chat selectedChat = chatList.getSelectionModel().getSelectedItem();
         if (selectedChat != null) {
             activeChat.setText(selectedChat.toString());
+            editChatTitleButton.setVisible(selectedChat.getChatSize() > 2);
             initChatLog();
+        }
+    }
+
+    public void handleEditTitle(MouseEvent mouseEvent) {
+        Chat selectedChat = chatList.getSelectionModel().getSelectedItem();
+        if (selectedChat != null) {
+            activeChat.setDisable(false);
+            editChatTitleButton.setVisible(false);
+            editTitleTextField.setVisible(true);
+
+            editTitleTextField.setText(activeChat.getText());
+            activeChat.setText("");
+            activeChat.setGraphic(editTitleTextField);
+        }
+    }
+
+    public void handleSubmitTitleChanges(KeyEvent keyEvent) {
+        Chat selectedChat = chatList.getSelectionModel().getSelectedItem();
+        if (selectedChat != null && !editTitleTextField.getText().trim().equals("")
+                && keyEvent.getCode().equals(KeyCode.ENTER)) {
+            selectedChat.setTitle(editTitleTextField.getText().trim());
+            chatService.updateChat(selectedChat);
+            activeChat.setGraphic(null);
+
+            activeChat.setDisable(true);
+            editChatTitleButton.setVisible(true);
+            editTitleTextField.setVisible(false);
+
             chatList.getSelectionModel().select(selectedChat);
+            displayChatName(null);
         }
     }
 
     public void handleSendMessage(MouseEvent mouseEvent) {
         Chat selectedChat = chatList.getSelectionModel().getSelectedItem();
+        Message selectedReply = messagesListView.getSelectionModel().getSelectedItem();
         if (!messageTextField.getText().trim().equals("")) {
-            messageService.sendMessage(LoginController.loggedUser, new HashMap<String, String>() {{
-                put("to", selectedChat.getID().toString());
-                put("message", messageTextField.getText());
-                put("reply", null);
-            }});
+            if (selectedReply == null) {
+                messageService.sendMessage(LoginController.loggedUser, new HashMap<String, String>() {{
+                    put("to", selectedChat.getID().toString());
+                    put("message", messageTextField.getText());
+                    put("reply", null);
+                }});
+            } else {
+                messageService.sendMessage(LoginController.loggedUser, new HashMap<String, String>() {{
+                    put("to", selectedChat.getID().toString());
+                    put("message", messageTextField.getText());
+                    put("reply", selectedReply.getMessageText());
+                }});
+            }
             messageTextField.setText("");
         }
         chatList.getSelectionModel().select(selectedChat);
@@ -552,5 +656,12 @@ public class MainController implements Observer {
         Scene groupChatScene = new Scene(root);
         groupChatStage.setScene(groupChatScene);
         groupChatStage.show();
+    }
+
+    public void handleMessageSelection(MouseEvent mouseEvent) {
+        if (messagesListView.getSelectionModel().getSelectedItem() == lastSelectedMessage) {
+            messagesListView.getSelectionModel().select(null);
+        }
+        lastSelectedMessage = messagesListView.getSelectionModel().getSelectedItem();
     }
 }

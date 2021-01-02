@@ -80,7 +80,11 @@ public class ChatDBRepository extends AbstractDBRepository<Long, Chat> implement
     }
 
     @Override
-    public Chat update(Chat entity) throws ValidationException {
-        return null;
+    public Chat update(Chat chat) throws ValidationException {
+        if (findOne(chat.getID()) == null) {
+            throw new RepositoryException("ID is invalid");
+        }
+        return super.update(chat, String.format("update \"CHATS\" set \"TITLE\" = '%s' where \"ID_CHAT\" = %d",
+                chat.getTitle(), chat.getID()));
     }
 }
