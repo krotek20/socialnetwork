@@ -6,9 +6,9 @@ public class ChatValidator implements Validator<Chat> {
     @Override
     public void validate(Chat chat) throws ValidationException {
         if (chat == null) {
-            throw new ValidationException("Entity not instance of Friendship");
+            throw new ValidationException("Entity not instance of chat");
         }
-        // validate chat name (sets default value)
+        // validate chat title (sets default value)
         if (chat.getTitle() == null || chat.getTitle().equals("")) {
             chat.setTitle("Default");
         }

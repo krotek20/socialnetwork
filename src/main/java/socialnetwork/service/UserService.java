@@ -4,6 +4,7 @@ import socialnetwork.Utils.design.NotifyStatus;
 import socialnetwork.Utils.design.Observable;
 import socialnetwork.Utils.Parse;
 import socialnetwork.domain.entities.Friendship;
+import socialnetwork.domain.enums.FriendshipStatus;
 import socialnetwork.domain.enums.Gender;
 import socialnetwork.domain.Tuple;
 import socialnetwork.domain.entities.User;
@@ -12,7 +13,6 @@ import socialnetwork.domain.dto.UserDTO;
 import socialnetwork.domain.validators.ValidationException;
 import socialnetwork.repository.Repository;
 import socialnetwork.repository.RepositoryException;
-
 
 import java.time.LocalDate;
 
@@ -143,6 +143,17 @@ public class UserService extends Observable {
     }
 
     /**
+     * Returns users paged by limit and offset.
+     *
+     * @param limit  number of entities on a page.
+     * @param offset index of the first entity read.
+     * @return an iterable with users paged.
+     */
+    public Iterable<User> findUsersPage(int limit, int offset) {
+        return userRepository.findPage(limit, offset);
+    }
+
+    /**
      * Finds all friendships of the user with the given id.
      *
      * @param id id of the user
@@ -189,17 +200,26 @@ public class UserService extends Observable {
      *
      * @param user instance of user to be transferred.
      * @return an {@code UserDTO}. It keeps user's
-     * firstname, lastname, email, birthdate and gender
+     * firstname, lastname, email, birthdate and his friends
      * in its implementation.
      */
-    private UserDTO convertToUserDTO(User user) {
+    public UserDTO convertToUserDTO(User user) {
         UserDTO userDTO = new UserDTO();
 
         userDTO.setFirstname(user.getFirstName());
         userDTO.setLastname(user.getLastName());
         userDTO.setEmail(user.getEmail());
         userDTO.setBirthDate(user.getBirthDate());
-        userDTO.setGender(user.getGender());
+
+        List<Friendship> friendships = findFriendships(user.getID());
+        List<User> friends = friendships
+                .stream()
+                .filter(x -> x.getStatus().equals(FriendshipStatus.APPROVED))
+                .map(x -> (x.getID().getLeft().equals(user.getID()) ?
+                        findOneUser(x.getID().getRight().toString()) :
+                        findOneUser(x.getID().getLeft().toString())))
+                .collect(Collectors.toList());
+        userDTO.setFriends(friends);
 
         return userDTO;
     }

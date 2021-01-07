@@ -5,7 +5,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import socialnetwork.domain.entities.User;
@@ -59,7 +58,6 @@ public class LoginController {
             mainStage.setTitle("Main");
 
             MainController mainController = loader.getController();
-            mainController.setServices();
 
             Scene mainScene = new Scene(root);
             mainStage.setScene(mainScene);

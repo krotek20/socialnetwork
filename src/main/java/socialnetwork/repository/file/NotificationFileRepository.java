@@ -71,4 +71,9 @@ public class NotificationFileRepository extends AbstractFileRepository<Long, Not
     protected String createEntityAsString(Notification notification) {
         return notification.toString();
     }
+
+    @Override
+    public Iterable<Notification> findPage(int limit, int offset) {
+        return null;
+    }
 }

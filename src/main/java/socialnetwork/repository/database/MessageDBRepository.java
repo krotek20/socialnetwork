@@ -59,6 +59,11 @@ public class MessageDBRepository extends AbstractDBRepository<Long, Message> imp
     }
 
     @Override
+    public Iterable<Message> findPage(int limit, int offset) {
+        return null;
+    }
+
+    @Override
     public Message save(Message message) throws ValidationException, RepositoryException {
         if (findOne(message.getID()) != null) {
             throw new RepositoryException("Message already exists");

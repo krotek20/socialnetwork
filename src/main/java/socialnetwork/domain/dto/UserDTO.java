@@ -1,19 +1,21 @@
 package socialnetwork.domain.dto;
 
-import socialnetwork.domain.enums.Gender;
+import socialnetwork.domain.entities.User;
 
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.List;
 
 public class UserDTO {
+    private List<User> friends;
     private LocalDate birthDate;
     private String firstname;
     private String lastname;
-    private Gender gender;
     private String email;
+    private boolean info;
 
     public UserDTO() {
-
+        this.info = false;
     }
 
     public LocalDate getBirthDate() {
@@ -40,20 +42,28 @@ public class UserDTO {
         this.lastname = lastname;
     }
 
-    public Gender getGender() {
-        return gender;
-    }
-
-    public void setGender(Gender gender) {
-        this.gender = gender;
-    }
-
     public String getEmail() {
         return email;
     }
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public List<User> getFriends() {
+        return friends;
+    }
+
+    public void setFriends(List<User> friends) {
+        this.friends = friends;
+    }
+
+    public boolean isInfo() {
+        return info;
+    }
+
+    public void setInfo(boolean info) {
+        this.info = info;
     }
 
     /**
@@ -71,12 +81,6 @@ public class UserDTO {
 
     @Override
     public String toString() {
-        return String.format(
-                "%-15s%-15s%-30s%-5s%s",
-                firstname,
-                lastname,
-                email,
-                getAge(birthDate),
-                gender.toString());
+        return (info ? email + "\n" + birthDate.toString() : firstname + " " + lastname);
     }
 }

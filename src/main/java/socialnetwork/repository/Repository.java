@@ -3,8 +3,6 @@ package socialnetwork.repository;
 import socialnetwork.domain.Entity;
 import socialnetwork.domain.validators.ValidationException;
 
-import java.sql.SQLException;
-
 /**
  * CRUD operations repository interface
  *
@@ -26,6 +24,13 @@ public interface Repository<ID, E extends Entity<ID>> {
      * @return all entities
      */
     Iterable<E> findAll();
+
+    /**
+     * @param limit  number of entities on a page.
+     * @param offset index of the first entity read.
+     * @return all entities paged
+     */
+    Iterable<E> findPage(int limit, int offset);
 
     /**
      * @param entity to be saved; it must be not null.

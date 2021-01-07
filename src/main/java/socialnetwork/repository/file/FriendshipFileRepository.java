@@ -36,4 +36,9 @@ public class FriendshipFileRepository extends AbstractFileRepository<Tuple<Long,
     protected String createEntityAsString(Friendship friendship) {
         return friendship.toString();
     }
+
+    @Override
+    public Iterable<Friendship> findPage(int limit, int offset) {
+        return null;
+    }
 }

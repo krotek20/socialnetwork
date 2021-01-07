@@ -52,4 +52,9 @@ public class ChatFileRepository extends AbstractFileRepository<Long, Chat> {
     protected String createEntityAsString(Chat chat) {
         return chat.toString();
     }
+
+    @Override
+    public Iterable<Chat> findPage(int limit, int offset) {
+        return null;
+    }
 }

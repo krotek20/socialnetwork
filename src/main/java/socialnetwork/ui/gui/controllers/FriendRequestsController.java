@@ -5,6 +5,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.input.MouseEvent;
 import socialnetwork.Utils.design.NotifyStatus;
@@ -35,13 +36,14 @@ public class FriendRequestsController implements Observer {
 
     @FXML
     public void initialize() {
-        cancelRequestButton.setDisable(true);
-
         this.friendshipService = MainGUI.getFriendshipService();
         this.userService = MainGUI.getUserService();
+
         friendshipService.register(this);
         userService.register(this);
 
+        cancelRequestButton.setDisable(true);
+        requestsList.setPlaceholder(new Label("No pending friend requests!"));
         requestsList.setItems(requestsModel);
         initModel();
     }
@@ -80,6 +82,8 @@ public class FriendRequestsController implements Observer {
     }
 
     public void handleUserSelection(MouseEvent mouseEvent) {
-        cancelRequestButton.setDisable(false);
+        if (requestsList.getSelectionModel().getSelectedItem() != null) {
+            cancelRequestButton.setDisable(false);
+        }
     }
 }

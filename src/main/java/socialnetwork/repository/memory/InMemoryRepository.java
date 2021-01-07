@@ -62,6 +62,11 @@ public class InMemoryRepository<ID, E extends Entity<ID>> extends Observable imp
         return entities.values();
     }
 
+    @Override
+    public Iterable<E> findPage(int limit, int offset) {
+        return null;
+    }
+
     /**
      * Validate and save an entity in the repository
      *

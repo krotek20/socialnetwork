@@ -50,6 +50,11 @@ public class FriendshipDBRepository
     }
 
     @Override
+    public Iterable<Friendship> findPage(int limit, int offset) {
+        return null;
+    }
+
+    @Override
     public Friendship save(Friendship friendship) throws ValidationException, RepositoryException {
         if (findOne(friendship.getID()) != null) {
             throw new RepositoryException("Friendship already exists");

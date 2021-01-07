@@ -7,9 +7,10 @@ package socialnetwork.domain.enums;
  * FRIENDSHIP - 0
  * CHAT - 1
  * MESSAGE - 2
+ * EVENT - 3
  */
 public enum NotificationType {
-    FRIENDSHIP((short) 0), CHAT((short) 1), MESSAGE((short) 2);
+    FRIENDSHIP((short) 0), CHAT((short) 1), MESSAGE((short) 2), EVENT((short) 3);
 
     private final short value;
 

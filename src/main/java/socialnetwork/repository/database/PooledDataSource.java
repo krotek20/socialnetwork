@@ -16,7 +16,7 @@ public class PooledDataSource {
         basicDS.setPassword(ApplicationContext.getPROPERTIES().getProperty("data.socialnetwork.password"));
         // Parameters for connection pooling
         basicDS.setInitialSize(10);
-        basicDS.setMaxTotal(1);
+        basicDS.setMaxTotal(10);
     }
 
     public static DataSource getDataSource() {

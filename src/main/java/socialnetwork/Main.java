@@ -19,6 +19,7 @@ public class Main {
         Repository<Tuple<Long, Long>, Friendship> friendshipDBRepository = new FriendshipDBRepository(new FriendshipValidator());
         Repository<Long, Chat> chatDBRepository = new ChatDBRepository(new ChatValidator());
         Repository<Long, Message> messageDBRepository = new MessageDBRepository(new MessageValidator());
+        EventDBRepository eventDbRepository = new EventDBRepository(new EventValidator());
         Repository<Long, Notification> notificationDBRepository = new NotificationDBRepository(new NotificationValidator());
 
         // Services
@@ -30,12 +31,14 @@ public class Main {
                 chatDBRepository, userDBRepository);
         MessageService messageService = new MessageService(
                 messageDBRepository, chatDBRepository);
+        EventService eventService = new EventService(
+                eventDbRepository);
         NotificationService notificationService = new NotificationService(
                 notificationDBRepository);
 
         // UI
-        UI mainUI = MainGUI.getInstance(userService, chatService,
-                messageService, friendshipService, notificationService);
+        UI mainUI = MainGUI.getInstance(userService, chatService, messageService,
+                friendshipService, eventService, notificationService);
 
         // RUN APPLICATION
         mainUI.run();

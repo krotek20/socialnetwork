@@ -1,7 +1,6 @@
 package socialnetwork.repository.file;
 
 import socialnetwork.Utils.design.NotifyStatus;
-import socialnetwork.Utils.design.Observable;
 import socialnetwork.Utils.design.Observer;
 import socialnetwork.domain.Entity;
 import socialnetwork.domain.entities.User;
