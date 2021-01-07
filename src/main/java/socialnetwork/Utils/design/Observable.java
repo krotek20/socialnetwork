@@ -1,5 +1,7 @@
 package socialnetwork.Utils.design;
 
+import javafx.application.Platform;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,7 +60,7 @@ public class Observable {
             clearChanged();
         }
         for (Observer observer : localObservers) {
-            observer.update(status);
+            Platform.runLater(() -> observer.update(status));
         }
     }
 

@@ -15,16 +15,16 @@
             <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="529.0" prefWidth="735.0">
                     <children>
-                        <Button id="filledButton" fx:id="addFriendButton" layoutX="254.0" layoutY="462.0"
+                        <Button id="filledButton" fx:id="addFriendButton" layoutX="255.0" layoutY="464.0"
                                 mnemonicParsing="false" onMouseClicked="#handleAddFriend" prefHeight="26.0"
                                 prefWidth="97.0" stylesheets="@../css/ButtonStyle.css" text="Add Friend">
                         </Button>
-                        <TableView fx:id="usersTable" layoutX="256.0" layoutY="181.0" onMouseClicked="#showUsersButtons"
-                                   prefHeight="255.0" prefWidth="218.0"
-                                   style="-fx-border-color: #ea5800; -fx-background-color: #f0ebeb;">
+                        <TableView fx:id="usersTable" layoutX="256.0" layoutY="172.0" onMouseClicked="#showUsersButtons"
+                                   prefHeight="246.0" prefWidth="226.0" stylesheets="@../css/TableViewStyle.css">
                             <columns>
                                 <TableColumn fx:id="userTableColumnName" prefWidth="106.0" text="Last name"/>
-                                <TableColumn fx:id="userTableColumnSurname" prefWidth="104.0" text="First name"/>
+                                <TableColumn fx:id="userTableColumnSurname" prefWidth="119.20001831054688"
+                                             text="First name"/>
                             </columns>
                         </TableView>
                         <TextField id="whiteTextField" fx:id="filterFriendsTextField" layoutX="536.0" layoutY="90.0"
@@ -34,15 +34,17 @@
                                 <Font name="Calibri" size="12.0"/>
                             </font>
                         </TextField>
-                        <TableView fx:id="friendsTable" layoutX="500.0" layoutY="183.0"
-                                   onMouseClicked="#showFriendlistButtons" prefHeight="251.0" prefWidth="215.0"
-                                   style="-fx-border-color: #ea5800; -fx-background-color: #f0ebeb;">
+                        <TableView fx:id="friendsTable" layoutX="494.0" layoutY="172.0"
+                                   onMouseClicked="#showFriendListButtons" prefHeight="246.0" prefWidth="226.0"
+                                   stylesheets="@../css/TableViewStyle.css">
                             <columns>
-                                <TableColumn fx:id="friendsTableColumnName" prefWidth="104.0" text="Last name"/>
-                                <TableColumn fx:id="friendsTableColumnSurname" prefWidth="109.0" text="First name"/>
+                                <TableColumn fx:id="friendsTableColumnName" prefWidth="109.99996948242188"
+                                             text="Last name"/>
+                                <TableColumn fx:id="friendsTableColumnSurname" prefWidth="116.39996337890625"
+                                             text="First name"/>
                             </columns>
                         </TableView>
-                        <Button id="filledButton" fx:id="deleteFriendButton" layoutX="500.0" layoutY="462.0"
+                        <Button id="filledButton" fx:id="deleteFriendButton" layoutX="500.0" layoutY="464.0"
                                 mnemonicParsing="false" onMouseClicked="#handleRemoveFriendButton" prefHeight="26.0"
                                 prefWidth="97.0" stylesheets="@../css/ButtonStyle.css" text="Remove Friend"/>
                         <TextField id="whiteTextField" fx:id="filterUsersTextField" layoutX="293.0" layoutY="90.0"
@@ -75,10 +77,10 @@
                                 </ImageView>
                             </graphic>
                         </Button>
-                        <Button id="filledButton" fx:id="openChatButton" layoutX="375.0" layoutY="462.0"
+                        <Button id="filledButton" fx:id="openChatButton" layoutX="386.0" layoutY="464.0"
                                 mnemonicParsing="false" onMouseClicked="#handleOpenChatUsers" prefHeight="26.0"
                                 prefWidth="97.0" stylesheets="@../css/ButtonStyle.css" text="Open Chat"/>
-                        <Button id="filledButton" fx:id="openFriendChatButton" layoutX="617.0" layoutY="462.0"
+                        <Button id="filledButton" fx:id="openFriendChatButton" layoutX="622.0" layoutY="464.0"
                                 mnemonicParsing="false" onMouseClicked="#handleOpenChatFriends" prefHeight="26.0"
                                 prefWidth="97.0" stylesheets="@../css/ButtonStyle.css" text="Open Chat"/>
                         <Button id="borderedButton" fx:id="friendReqButton" layoutX="630.0" layoutY="12.0"
@@ -93,8 +95,10 @@
                                 </ImageView>
                             </graphic>
                         </Button>
-                        <DatePicker fx:id="fromDate" layoutX="413.0" layoutY="17.0" promptText="from"/>
-                        <DatePicker fx:id="toDate" layoutX="413.0" layoutY="46.0" promptText="to"/>
+                        <DatePicker fx:id="fromDate" layoutX="413.0" layoutY="17.0" promptText="from"
+                                    stylesheets="@../css/DatePickerStyle.css"/>
+                        <DatePicker fx:id="toDate" layoutX="413.0" layoutY="46.0" promptText="to"
+                                    stylesheets="@../css/DatePickerStyle.css"/>
                         <Button id="filledButton" layoutX="308.0" layoutY="19.0" mnemonicParsing="false"
                                 onMouseClicked="#handleExportActivity" stylesheets="@../css/ButtonStyle.css"
                                 text="Export Activity"/>
@@ -118,19 +122,32 @@
                                         <Image url="@../images/logo.png"/>
                                     </image>
                                 </ImageView>
+                                <Label fx:id="infoLabel" layoutX="101.0" layoutY="414.0" text="INFO" textFill="WHITE">
+                                    <font>
+                                        <Font name="Calibri" size="14.0"/>
+                                    </font>
+                                </Label>
+                                <Label layoutX="46.0" layoutY="382.0" text="PERSONAL DATA" textFill="WHITE">
+                                    <font>
+                                        <Font size="18.0"/>
+                                    </font>
+                                </Label>
                             </children>
                         </AnchorPane>
+                        <Pagination fx:id="pagination" layoutX="255.0" layoutY="172.0" maxPageIndicatorCount="3"
+                                    prefHeight="292.0" prefWidth="226.0" stylesheets="@../css/PaginationStyle.css"/>
                     </children>
                 </AnchorPane>
             </content>
         </Tab>
-        <Tab fx:id="notificationsTab" text="Notifications">
+        <Tab fx:id="notificationsTab" text="Notifications &amp; Events">
             <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                     <children>
-                        <ListView fx:id="notificationList" onMouseClicked="#handleNotificationsClick" prefHeight="289.0"
-                                  prefWidth="259.0" stylesheets="@../css/ListViewStyle.css"/>
-                        <Button id="borderedButton" fx:id="acceptButton" layoutX="33.0" layoutY="324.0"
+                        <ListView fx:id="notificationList" layoutX="41.0" layoutY="36.0"
+                                  onMouseClicked="#handleNotificationsClick" prefHeight="210.0" prefWidth="259.0"
+                                  stylesheets="@../css/ListViewStyle.css"/>
+                        <Button id="borderedButton" fx:id="acceptButton" layoutX="317.0" layoutY="59.0"
                                 mnemonicParsing="false" onMouseClicked="#handleAcceptFriendRequest" prefHeight="34.0"
                                 prefWidth="29.0" stylesheets="@../css/ButtonStyle.css">
                             <graphic>
@@ -141,17 +158,80 @@
                                 </ImageView>
                             </graphic>
                         </Button>
-                        <Button id="borderedButton" fx:id="rejectButton" layoutX="189.0" layoutY="324.0"
-                                mnemonicParsing="false" onMouseClicked="#handleRejectFriendRequest"
-                                stylesheets="@../css/ButtonStyle.css">
+                        <Button id="borderedButton" fx:id="rejectButton" layoutX="317.0" layoutY="185.0"
+                                mnemonicParsing="false" onMouseClicked="#handleRejectFriendRequest" prefHeight="34.0"
+                                prefWidth="29.0" stylesheets="@../css/ButtonStyle.css">
                             <graphic>
-                                <ImageView fitHeight="29.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                                <ImageView fitHeight="23.0" fitWidth="19.0" pickOnBounds="true" preserveRatio="true">
                                     <image>
                                         <Image url="@../images/reject_icon.png"/>
                                     </image>
                                 </ImageView>
                             </graphic>
                         </Button>
+                        <Label layoutX="107.0" layoutY="6.0" text="NOTIFICATIONS" textFill="WHITE">
+                            <font>
+                                <Font name="Calibri" size="18.0"/>
+                            </font>
+                        </Label>
+                        <ListView fx:id="eventsListView" layoutX="41.0" layoutY="299.0"
+                                  onMouseClicked="#handleEventListSelection" prefHeight="210.0" prefWidth="259.0"
+                                  stylesheets="@../css/ListViewStyle.css"/>
+                        <Label layoutX="137.0" layoutY="269.0" text="EVENTS" textFill="WHITE">
+                            <font>
+                                <Font name="Calibri" size="18.0"/>
+                            </font>
+                        </Label>
+                        <Button id="filledButton" fx:id="joinEventButton" layoutX="133.0" layoutY="520.0"
+                                mnemonicParsing="false" onMouseClicked="#handleJoinEvent" prefHeight="27.0"
+                                prefWidth="63.0" stylesheets="@../css/ButtonStyle.css" text="Join"/>
+                        <ListView fx:id="userEventsListView" layoutX="431.0" layoutY="299.0"
+                                  onMouseClicked="#handleEventSubscription" prefHeight="210.0" prefWidth="259.0"
+                                  stylesheets="@../css/ListViewStyle.css"/>
+                        <Label layoutX="509.0" layoutY="269.0" text="YOUR EVENTS" textFill="WHITE">
+                            <font>
+                                <Font name="Calibri" size="18.0"/>
+                            </font>
+                        </Label>
+                        <Button id="filledButton" fx:id="subscribeButton" layoutX="459.0" layoutY="521.0"
+                                mnemonicParsing="false" onMouseClicked="#handleSubscribeButton" prefHeight="27.0"
+                                prefWidth="83.0" stylesheets="@../css/ButtonStyle.css" text="Subscribe"/>
+                        <Button id="filledButton" fx:id="unsubscribeButton" layoutX="580.0" layoutY="521.0"
+                                mnemonicParsing="false" onMouseClicked="#handleUnsubscribeButton" prefHeight="27.0"
+                                prefWidth="83.0" stylesheets="@../css/ButtonStyle.css" text="Unsubscribe"/>
+                        <DatePicker fx:id="eventDatePicker" layoutX="445.0" layoutY="63.0" prefHeight="26.0"
+                                    prefWidth="231.0" promptText="date" stylesheets="@../css/DatePickerStyle.css"/>
+                        <TextField id="whiteTextField" fx:id="eventHourTextField" alignment="CENTER" layoutX="445.0"
+                                   layoutY="102.0" prefHeight="26.0" prefWidth="34.0" promptText="HH"
+                                   stylesheets="@../css/TextFieldStyle.css"/>
+                        <Label layoutX="506.0" layoutY="25.0" text="CREATE EVENT" textFill="WHITE">
+                            <font>
+                                <Font name="Calibri" size="18.0"/>
+                            </font>
+                        </Label>
+                        <TextField id="whiteTextField" fx:id="eventMinuteTextField" alignment="CENTER" layoutX="493.0"
+                                   layoutY="102.0" prefHeight="26.0" prefWidth="34.0" promptText="MM"
+                                   stylesheets="@../css/TextFieldStyle.css"/>
+                        <TextField id="whiteTextField" fx:id="eventSecondTextField" alignment="CENTER" layoutX="538.0"
+                                   layoutY="102.0" prefHeight="26.0" prefWidth="34.0" promptText="SS"
+                                   stylesheets="@../css/TextFieldStyle.css"/>
+                        <TextField id="whiteTextField" fx:id="eventTitleTextField" layoutX="445.0" layoutY="141.0"
+                                   prefHeight="26.0" prefWidth="128.0" promptText="Title"
+                                   stylesheets="@../css/TextFieldStyle.css"/>
+                        <Button id="filledButton" fx:id="createEventButton" layoutX="600.0" layoutY="124.0"
+                                mnemonicParsing="false" onMouseClicked="#handleCreateEvent" prefHeight="34.0"
+                                prefWidth="62.0" stylesheets="@../css/ButtonStyle.css" text="Create"/>
+                        <Label layoutX="484.0" layoutY="106.0" prefHeight="18.0" prefWidth="8.0" text=":"
+                               textFill="WHITE">
+                            <font>
+                                <Font size="13.0"/>
+                            </font>
+                        </Label>
+                        <Label layoutX="532.0" layoutY="106.0" text=":" textFill="WHITE">
+                            <font>
+                                <Font size="13.0"/>
+                            </font>
+                        </Label>
                     </children>
                 </AnchorPane>
             </content>
@@ -200,9 +280,9 @@
                                 <Font name="Corbel" size="18.0"/>
                             </font>
                         </TextField>
-                        <ListView fx:id="messagesListView" layoutX="10.0" layoutY="52.0" prefHeight="468.0"
-                                  prefWidth="480.0" stylesheets="@../css/ListViewStyle.css"
-                                  onMouseClicked="#handleMessageSelection"/>
+                        <ListView fx:id="messagesListView" layoutX="10.0" layoutY="52.0"
+                                  onMouseClicked="#handleMessageSelection" prefHeight="468.0" prefWidth="480.0"
+                                  stylesheets="@../css/ListViewStyle.css"/>
                     </children>
                 </AnchorPane>
             </content>

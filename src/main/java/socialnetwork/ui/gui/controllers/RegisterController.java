@@ -8,14 +8,11 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseDragEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import socialnetwork.domain.enums.Gender;
 import socialnetwork.domain.validators.ValidationException;
-import socialnetwork.repository.RepositoryException;
-import socialnetwork.service.ServiceException;
 import socialnetwork.ui.gui.MainGUI;
 
 import java.io.IOException;
@@ -37,7 +34,6 @@ public class RegisterController {
     private PasswordField confirmPasswordText;
     @FXML
     private DatePicker birthDatePicker;
-
     @FXML
     private Label firstNameEmptyLabel;
     @FXML
@@ -50,10 +46,6 @@ public class RegisterController {
     private Label confirmEmptyLabel;
     @FXML
     private Label birthDateEmptyLabel;
-
-    @FXML
-    private Label signInLabel;
-
     @FXML
     private ComboBox<String> genderComboBox;
 

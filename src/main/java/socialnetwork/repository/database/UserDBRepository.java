@@ -16,6 +16,7 @@ public class UserDBRepository extends AbstractDBRepository<Long, User> implement
 
     public UserDBRepository(Validator<User> validator) {
         super(validator);
+        findAll();
     }
 
     @Override
@@ -48,6 +49,13 @@ public class UserDBRepository extends AbstractDBRepository<Long, User> implement
     @Override
     public Iterable<User> findAll() {
         return super.findAll("select * from \"USERS\"");
+    }
+
+    @Override
+    public Iterable<User> findPage(int limit, int offset) {
+        return super.findAll(String.format(
+                "select * from \"USERS\" order by \"ID_USER\" limit %d offset %d",
+                limit, offset));
     }
 
     @Override

@@ -56,6 +56,11 @@ public class ChatDBRepository extends AbstractDBRepository<Long, Chat> implement
     }
 
     @Override
+    public Iterable<Chat> findPage(int limit, int offset) {
+        return null;
+    }
+
+    @Override
     public Chat save(Chat chat) throws ValidationException {
         if (findOne(chat.getID()) != null) {
             throw new RepositoryException("Chat already exists");

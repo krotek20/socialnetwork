@@ -5,7 +5,6 @@ import socialnetwork.ui.gui.controllers.LoginController;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Chat class is an Entity type data

@@ -1,0 +1,21 @@
+.date-picker .arrow-button .arrow {
+    -fx-background-radius: 0px;
+    -fx-background-color: #ea5800;
+}
+
+.date-picker .arrow-button:hover .arrow {
+    -fx-background-radius: 0px;
+    -fx-background-color: #ea5800;
+    -fx-opacity: 0.6;
+    -fx-cursor: hand;
+}
+
+.date-picker .cell:hover {
+    -fx-background-color: #ea5800;
+    -fx-opacity: 0.6;
+    -fx-cursor: hand;
+}
+
+.date-picker .cell:focused {
+    -fx-background-color: #ea5800;
+}

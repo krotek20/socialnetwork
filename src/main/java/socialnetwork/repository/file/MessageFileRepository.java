@@ -63,4 +63,9 @@ public class MessageFileRepository extends AbstractFileRepository<Long, Message>
     protected String createEntityAsString(Message message) {
         return message.toString();
     }
+
+    @Override
+    public Iterable<Message> findPage(int limit, int offset) {
+        return null;
+    }
 }

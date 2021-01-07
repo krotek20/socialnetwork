@@ -45,17 +45,19 @@ public class GroupChatController implements Observer {
 
     @FXML
     public void initialize() {
+        this.chatService = MainGUI.getChatService();
+        this.userService = MainGUI.getUserService();
+
+        userService.register(this);
+        chatService.register(this);
+
         addToGroupChatButton.setDisable(true);
         createGroupChatButton.setDisable(true);
         removeFromGroupChatButton.setDisable(true);
 
         groupChatUsersList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        this.userService = MainGUI.getUserService();
-        this.chatService = MainGUI.getChatService();
-        userService.register(this);
-        chatService.register(this);
-
         groupChatUsersList.setItems(usersModel);
+        addedUsersList.setPlaceholder(new Label("Add people in your group chat!"));
         addedUsersList.setItems(groupUsersModel);
         initModel();
     }
@@ -131,10 +133,14 @@ public class GroupChatController implements Observer {
     }
 
     public void handleGroupUserSelection(MouseEvent mouseEvent) {
-        removeFromGroupChatButton.setDisable(false);
+        if (addedUsersList.getSelectionModel().getSelectedItem() != null) {
+            removeFromGroupChatButton.setDisable(false);
+        }
     }
 
     public void handleUserSelection(MouseEvent mouseEvent) {
-        addToGroupChatButton.setDisable(false);
+        if (groupChatUsersList.getSelectionModel().getSelectedItem() != null) {
+            addToGroupChatButton.setDisable(false);
+        }
     }
 }

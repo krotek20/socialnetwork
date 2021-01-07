@@ -16,6 +16,7 @@
     -fx-text-fill: #ea5800;
 }
 
+.button:focused,
 .button:hover {
     -fx-opacity: 0.6;
     -fx-cursor: HAND;

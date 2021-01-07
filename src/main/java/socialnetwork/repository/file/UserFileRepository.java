@@ -6,7 +6,6 @@ import socialnetwork.domain.enums.Role;
 import socialnetwork.domain.entities.User;
 import socialnetwork.domain.validators.Validator;
 
-import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -50,5 +49,10 @@ public class UserFileRepository extends AbstractFileRepository<Long, User> {
     @Override
     protected String createEntityAsString(User user) {
         return user.toString();
+    }
+
+    @Override
+    public Iterable<User> findPage(int limit, int offset) {
+        return null;
     }
 }

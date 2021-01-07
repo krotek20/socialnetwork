@@ -10,7 +10,6 @@ import socialnetwork.domain.enums.NotificationType;
 import socialnetwork.domain.validators.ValidationException;
 import socialnetwork.repository.Repository;
 import socialnetwork.repository.RepositoryException;
-import socialnetwork.ui.gui.controllers.LoginController;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -104,9 +103,9 @@ public class ChatService extends Observable {
     }
 
     /**
-     * Edits a current chat properties with the given ones.
+     * Updates the current chat properties with the given ones.
      *
-     * @param chat a specific chat entity with different properties.
+     * @param chat the specific chat entity with different properties.
      */
     public void updateChat(Chat chat) {
         chatRepository.update(chat);

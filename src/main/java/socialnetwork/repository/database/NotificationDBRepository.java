@@ -36,9 +36,9 @@ public class NotificationDBRepository
         String notificationText = (String) resultSet.get("NOTIFICATION_TEXT");
         LocalDateTime timestamp = ((Timestamp) resultSet.get("NOTIFICATION_TIMESTAMP")).toLocalDateTime();
 
-        Map<User, NotificationStatus> notifiedUsers = new HashMap<>();
         User from = userDBRepository.findOne(fromID);
         NotificationType type = NotificationType.fromValue(typeShort);
+        Map<User, NotificationStatus> notifiedUsers = new HashMap<>();
 
         Map<Long, NotificationStatus> usersID = super.getNotifiedUsersID(String.format(
                 "select \"ID_USER\", \"NOTIFICATION_STATUS\" " +
@@ -68,6 +68,11 @@ public class NotificationDBRepository
     @Override
     public Iterable<Notification> findAll() {
         return super.findAll("select * from \"NOTIFICATIONS\"");
+    }
+
+    @Override
+    public Iterable<Notification> findPage(int limit, int offset) {
+        return null;
     }
 
     @Override
