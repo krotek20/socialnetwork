@@ -6,6 +6,7 @@
 
 .list-cell:selected {
     -fx-background-color: #ea5800;
+    -fx-text-fill: white;
 }
 
 .list-cell:hover {
