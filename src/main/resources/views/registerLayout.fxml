@@ -12,7 +12,8 @@
                     BorderPane.alignment="CENTER">
             <children>
                 <DatePicker fx:id="birthDatePicker" editable="false" layoutX="213.0" layoutY="293.0"
-                            onAction="#birthDateInput" promptText="Birth date"/>
+                            onAction="#birthDateInput" promptText="Birth date"
+                            stylesheets="@../css/DatePickerStyle.css"/>
                 <TextField id="whiteTextField" fx:id="lastNameText" layoutX="306.0" layoutY="67.0"
                            onKeyTyped="#lastNameInput" prefHeight="25.0" prefWidth="132.0" promptText="Last name"
                            stylesheets="@../css/TextFieldStyle.css"/>
@@ -25,7 +26,8 @@
                 <TextField id="whiteTextField" fx:id="emailText" layoutX="171.0" layoutY="117.0"
                            onKeyTyped="#emailInput" prefHeight="25.0" prefWidth="263.0" promptText="Email address"
                            stylesheets="@../css/TextFieldStyle.css"/>
-                <ComboBox fx:id="genderComboBox" layoutX="222.0" layoutY="260.0" prefWidth="150.0" promptText="Gender"/>
+                <ComboBox fx:id="genderComboBox" layoutX="222.0" layoutY="260.0" prefWidth="150.0" promptText="Gender"
+                          stylesheets="@../css/ComboBoxStyle.css"/>
                 <PasswordField id="whiteTextField" fx:id="confirmPasswordText" layoutX="173.0" layoutY="214.0"
                                onKeyTyped="#confirmInput" prefHeight="25.0" prefWidth="263.0"
                                promptText="Confirm password" stylesheets="@../css/TextFieldStyle.css"/>

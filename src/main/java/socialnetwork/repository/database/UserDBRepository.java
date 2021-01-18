@@ -1,5 +1,6 @@
 package socialnetwork.repository.database;
 
+import org.mindrot.jbcrypt.BCrypt;
 import socialnetwork.domain.enums.Gender;
 import socialnetwork.domain.enums.Role;
 import socialnetwork.domain.entities.User;
@@ -63,10 +64,11 @@ public class UserDBRepository extends AbstractDBRepository<Long, User> implement
         if (findOne(user.getID()) != null) {
             throw new RepositoryException("User already exists");
         }
+        String encryptedPassword = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
         return super.save(user, String.format("insert into \"USERS\" " +
                         "values(%d, '%s', '%s', '%s', '%s', DATE('%s'), '%s', '%s')",
                 user.getID(), user.getFirstName(), user.getLastName(), user.getEmail(),
-                user.getPassword(), user.getBirthDate(), user.getGender(), user.getRole()));
+                encryptedPassword, user.getBirthDate(), user.getGender(), user.getRole()));
     }
 
     @Override

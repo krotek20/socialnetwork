@@ -1,5 +1,6 @@
 package socialnetwork.service;
 
+import org.mindrot.jbcrypt.BCrypt;
 import socialnetwork.Utils.design.NotifyStatus;
 import socialnetwork.Utils.design.Observable;
 import socialnetwork.Utils.Parse;
@@ -48,7 +49,7 @@ public class UserService extends Observable {
         String password = loginMap.get("password");
         Iterable<User> users = userRepository.findAll();
         for (User user : users) {
-            if (user.getEmail().equals(email) && user.getPassword().equals(password)) {
+            if (user.getEmail().equals(email) && BCrypt.checkpw(password, user.getPassword())) {
                 return user;
             }
         }
